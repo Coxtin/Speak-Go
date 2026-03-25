@@ -9,7 +9,7 @@ import "./global.css";
 import HomeScreen from './src/main/HomeScreen';
 import VoiceCommands from './src/screens/TestingVoiceCommands';
 import LoginScreen from './src/screens/auth/LoginScreen'
-import SignUpScreen from './src/screens/auth/SignuUpScreen'
+import SignUpScreen from './src/screens/auth/SignUpScreen'
 
 
 const Stack = createNativeStackNavigator();

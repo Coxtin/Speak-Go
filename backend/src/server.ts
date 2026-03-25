@@ -7,15 +7,17 @@ import fs from 'fs'
 
 dotenv.config();
 
-import pool from "./db";
+import pool from "./config/db";
 import { open } from 'fs';
+
+import authRoutes from './routes/authRoutes'
 
 const port = 5002;
 
 async function getUsers() {
     const query = 'SELECT * FROM users';
     try{
-        const data = await pool.query(query);
+        const data = await pool.query(query); 
         return data.rows;
     }
     catch (error){
@@ -71,6 +73,7 @@ app.post("/api/transcribe", upload.single('audio'), async (req: Request, res: Re
 
 });
 
+app.post('/api/register', authRoutes);
 // app.get('/', async (req: Request, res: Response) => {
 //     try {
 //         const users = await getUsers();
