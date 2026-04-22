@@ -3,31 +3,42 @@ import { z } from 'zod'
 export const signupSchema = z.object({
     firstName: z
         .string()
-        .nonempty({message: "First name required!"}),
+        .nonempty({message: "Prenumele este obligatoriu!"}),
         lastName: z
             .string()
-            .nonempty({message: "Last name required!"}),
+            .nonempty({message: "Numele este obligatoriu!"}),
         username: z
             .string()
-            .min(5, { message: "Username must be at least 5 characters!" })
-            .max(20, { message: "Username must be at most 20 characters!" })
-            .nonempty({message: "Username required!"}),
-        email: z.email({ message: "Enter a valid email address!" }),
+            .min(5, { message: "Numele de utilizator trebuie sa aiba cel putin 5 caractere!" })
+            .max(20, { message: "Numele de utilizator trebuie sa aiba cel mult 20 de caractere!" })
+            .nonempty({message: "Numele de utilizator este obligatoriu!"}),
+        email: z.email({ message: "Introdu o adresa de email valida!" }),
         birthDate: z
         .date({
-           error: issue => issue.input === undefined ? "Please enter your birth date!" : "Invalid date!"
+           error: issue => issue.input === undefined ? "Data nasterii este obligatorie!" : "Data invalida!"
         })
-        .min(new Date("1900-01-01"), {message: "You are to old to create an accoun!"})
-        .max(new Date(), {message: "You are too young to create an account"}),
+        .min(new Date("1900-01-01"), {message: "Data nasterii este prea veche pentru un cont valid!"})
+        .max(new Date(), {message: "Data nasterii nu poate fi in viitor!"}),
         password: z
             .string()
-            .min(8, {message: "Password must be at least 8 characters!"})
-            .regex(/[A-Z]/, {message: "Password must contain at least one capital letter!"})
-            .regex(/[0-9]/, {message: "Password must contain at least one number!"})
-            .regex(/[^a-zA-Z0-9]/, {message: "Password must contain at least one special character!"}),
+            .min(8, {message: "Parola trebuie sa aiba cel putin 8 caractere!"})
+            .regex(/[A-Z]/, {message: "Parola trebuie sa contina cel putin o litera mare!"})
+            .regex(/[0-9]/, {message: "Parola trebuie sa contina cel putin o cifra!"})
+            .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie sa contina cel putin un caracter special!"}),
         repeatPassword: z
             .string()
-            .nonempty({message: "Retype password!"})
-}).refine((data) => data.password === data.repeatPassword, {message: "The passwords do not match!", path: ["repeatPassword"]})
+            .nonempty({message: "Reintrodu parola!"})
+}).refine((data) => data.password === data.repeatPassword, {message: "Parolele nu coincid!", path: ["repeatPassword"]})
+
+export const loginSchema = z.object({
+    email: z
+        .email({message: "Introdu o adresa de email valida!"})
+        .nonempty({message: "Campul email este gol!"}),
+    password: z
+        .string()
+        .min(1, {message: "Campul parola este gol!"})
+})
+
 
 export type SignUpFormValues = z.infer<typeof signupSchema>
+export type LoginFormValues = z.infer<typeof loginSchema>

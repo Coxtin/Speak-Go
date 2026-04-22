@@ -1,24 +1,21 @@
-import React, {useState, useEffect} from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, {useState} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, TouchableOpacity, Platform, Alert, TextInput, KeyboardAvoidingView, Modal, ScrollView } from "react-native";
 
 import { useForm, Controller } from "react-hook-form";
-import { email, refine, regex, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignUpFormValues, signupSchema } from "../../schemas/auth.schema";
 
 import '../../../global.css';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { registerUser } from "../../api/auth.api";
+import { useNavigation } from "@react-navigation/native";
 
 
 const SignupPage = () => {
 
-    const navigation = useNavigation<any>();
-
     const [showDatePicker, setShowDatePicker] = useState(false)
+    const navigation = useNavigation<any>();
 
     const {
         control,
@@ -39,20 +36,27 @@ const SignupPage = () => {
     });
 
    const onSubmit = async (data: SignUpFormValues) => {
-        // if (Platform.OS === "web"){
-        //     window.alert(`Succes! Logare initiata pentru ${data.email}`)
-        // } else {
-        //     Alert.alert(`Succes! Logare initiate pentru ${data.email}`);
-        // }
+        try {
+            const response = await registerUser(data);
+            const successMessage = response?.message || "Cont creat cu succes!";
 
-        const response = await registerUser(data)
-        console.log(response)
-        
+            if (Platform.OS === "web") {
+                window.alert(successMessage);
+            } else {
+                Alert.alert("Succes", successMessage);
+            }
+        } catch (error: any) {
+            const message = error?.message || "A aparut o eroare necunoscuta.";
 
+            if (Platform.OS === "web") {
+                window.alert(message);
+            } else {
+                Alert.alert("Eroare", message);
+            }
+        }
    }
 
     return (
-
         <SafeAreaView className="flex-1 bg-slate-100">
            <KeyboardAvoidingView 
                 behavior = {Platform.OS === "ios" ? "padding" : "height"}
@@ -60,15 +64,15 @@ const SignupPage = () => {
                 keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
                 <ScrollView
-                    className="px-8"
-                    contentContainerClassName="flex-grow justify-center px-8 pb-12 pt-6"
+                    contentContainerClassName="flex-grow justify-center px-6 py-10"
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <View className="mb-8 flex-1 justify-center">
-                        <Text className="text-4l">Salut</Text>
-                        <Text className="text-lg">Sa incepem prin crearea unui cont!</Text>
-                    </View>
+                    <View className="w-full self-center rounded-2xl border border-slate-200 bg-white p-6">
+                        <View className="mb-6">
+                            <Text className="text-3xl font-semibold text-slate-900">Signup</Text>
+                            <Text className="mt-1 text-sm text-slate-500">Creează un cont nou Speak&Go</Text>
+                        </View>
 
                     <View className="mb-4">
                         <Controller
@@ -79,12 +83,14 @@ const SignupPage = () => {
                             }) => (
                                 <>
                                 <Text
-                                    className="text-sm font-sans"
+                                    className="mb-2 text-sm text-slate-600"
                                 >
-                                    Enter your first name:</Text>
+                                    Prenume
+                                </Text>
                                 <TextInput
-                                    className={`bg-gray-100 px-4 py-4 rounded-xl text-gray-800 border ${errors.firstName ? `border-red-150` : `border-gray-200`}`}
+                                    className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.firstName ? "border-red-400" : "border-slate-300"}`}
                                     placeholder="John"
+                                    placeholderTextColor="#94a3b8"
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
@@ -93,7 +99,7 @@ const SignupPage = () => {
                             )}
                             
                         />
-                        {errors.firstName && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.firstName.message}</Text>)}
+                        {errors.firstName && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.firstName.message}</Text>)}
                     </View>
 
                     <View className="mb-4">
@@ -105,13 +111,14 @@ const SignupPage = () => {
                                 }) => (
                                     <>
                                     <Text
-                                        className="text-sm font-sans"
+                                        className="mb-2 text-sm text-slate-600"
                                     >
-                                        Enter your last name:
+                                        Nume
                                     </Text>
                                     <TextInput
-                                    className={`bg-gray-100 px-4 py-4 rounded-xl text-gray-800 border ${errors.lastName ? `border-red-150` : `border-gray-200`}`}
+                                    className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.lastName ? "border-red-400" : "border-slate-300"}`}
                                     placeholder="Doe"
+                                    placeholderTextColor="#94a3b8"
                                     onChangeText={onChange}
                                     onBlur={onBlur}
                                     value={value}
@@ -119,7 +126,7 @@ const SignupPage = () => {
                                     </>
                                 )}
                             />
-                            {errors.lastName && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.lastName.message}</Text>)}
+                            {errors.lastName && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.lastName.message}</Text>)}
                     </View>
 
                     <View className="mb-4">
@@ -130,14 +137,16 @@ const SignupPage = () => {
                                 field: {onChange, onBlur, value}
                             }) => (
                                <>
-                               <Text
-                                    className="text-sm font-sans"
+                                <Text
+                                     className="mb-2 text-sm text-slate-600"
                                 >
-                                    Enter your username:
-                               </Text>
+                                    Utilizator
+                                </Text>
 
                                 <TextInput
-                                    className={`bg-gray-100 px-4 py-4 rounded-xl text-gray-800 border ${errors.username ? `border-red-150` : `border-gray-200`}`}
+                                    className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.username ? "border-red-400" : "border-slate-300"}`}
+                                    placeholder="username"
+                                    placeholderTextColor="#94a3b8"
                                     onChangeText={onChange}
                                     onBlur={onBlur}
                                     value={value}
@@ -147,7 +156,7 @@ const SignupPage = () => {
                                </>
                             )}                       
                         />
-                        {errors.username && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.username.message}</Text>)}
+                        {errors.username && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.username.message}</Text>)}
 
                     </View>
 
@@ -160,13 +169,14 @@ const SignupPage = () => {
                                 }) => (
                                     <>
                                     <Text
-                                        className="text-sm font-sans"
+                                        className="mb-2 text-sm text-slate-600"
                                     >  
-                                        Enter your email address:
+                                        Email
                                     </Text>
                                     <TextInput
-                                    className={`bg-gray-100 px-4 py-4 rounded-xl text-gray-800 border ${errors.email ? `border-red-150` : `border-gray-200`}`}
+                                    className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.email ? "border-red-400" : "border-slate-300"}`}
                                     placeholder="ceva@ceva.com"
+                                    placeholderTextColor="#94a3b8"
                                     onChangeText={onChange}
                                     onBlur={onBlur}
                                     value={value}
@@ -176,7 +186,7 @@ const SignupPage = () => {
                                     </>
                                 )}
                             />
-                            {errors.email && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.email.message}</Text>)}
+                            {errors.email && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.email.message}</Text>)}
                     </View>
 
                     <View className="mb-4">
@@ -188,17 +198,17 @@ const SignupPage = () => {
                                 }) => (
                                     <>
                                     <Text
-                                        className="text-sm font-sans"
+                                        className="mb-2 text-sm text-slate-600"
                                     >
-                                        Enter your birthday:  
+                                        Data nașterii
                                     </Text>
                                     <View>
                                         <TouchableOpacity
                                             activeOpacity={0.7}
                                             onPress={() => setShowDatePicker(true)}
-                                            className={`bg-gray-100 px-4 py-4 rounded-xl border ${errors.birthDate ? 'border-red-500' : 'border-gray-200'}`}
+                                            className={`rounded-xl border px-4 py-3 ${errors.birthDate ? "border-red-400" : "border-slate-300"}`}
                                         >
-                                            <Text className={value ? "text-gray-800" : "text-gray-400"}>
+                                            <Text className={value ? "text-slate-900" : "text-slate-400"}>
                                                 {value ? value.toLocaleDateString('ro-RO') : "ZZ/LL/AAAA"}
                                             </Text>
                                         </TouchableOpacity>
@@ -224,7 +234,7 @@ const SignupPage = () => {
                                                                 className="px-4 py-1"
                                                             >
                                                                 <Text className="text-blue-500 font-semibold text-base">
-                                                                    Done
+                                                                    Gata
                                                                 </Text>
                                                             </TouchableOpacity>
                                                         </View>
@@ -232,7 +242,6 @@ const SignupPage = () => {
                                                         <DateTimePicker
                                                             mode="date"
                                                             value={value || new Date()}
-                                                            // maximumDate={new Date()}
                                                             display="spinner"
                                                             textColor="#000000"
                                                             onChange={(event, selectedDate) => {
@@ -265,10 +274,10 @@ const SignupPage = () => {
                             )}
                         />
 
-                        {errors.birthDate && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.birthDate.message}</Text>)}
+                        {errors.birthDate && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.birthDate.message}</Text>)}
 
                     </View>
-                
+                 
                     <View className="mb-4">
                         <Controller
                             control={control}
@@ -278,11 +287,13 @@ const SignupPage = () => {
                             }) => (
                                 <>
                                 <Text className="text-sm font-sans">
-                                    Enter a password: 
+                                    Parolă
                                 </Text>
                                 
                                 <TextInput
-                                     className={`bg-gray-100 px-4 py-4 rounded-xl text-gray-800 border ${errors.password ? `border-red-150` : `border-gray-200`}`}
+                                     className={`mt-2 rounded-xl border px-4 py-3 text-slate-900 ${errors.password ? "border-red-400" : "border-slate-300"}`}
+                                     placeholder="Introdu parola"
+                                     placeholderTextColor="#94a3b8"
                                      onChangeText={onChange}
                                      onBlur={onBlur}
                                      value={value}
@@ -291,8 +302,8 @@ const SignupPage = () => {
                                 </>
                             )}
                         />
-                        
-                        {errors.password && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.password.message}</Text>)}
+                         
+                        {errors.password && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.password.message}</Text>)}
 
                     </View>
                     
@@ -304,12 +315,14 @@ const SignupPage = () => {
                                 field: {onChange, onBlur, value}
                             }) => (
                                 <>
-                                <Text className="text-sm font-sans">
-                                    Repeat password: 
+                                <Text className="mb-2 text-sm text-slate-600">
+                                    Repetă parola
                                 </Text>
                                 
                                 <TextInput
-                                     className={`bg-gray-100 px-4 py-4 rounded-xl text-gray-800 border ${errors.repeatPassword ? `border-red-150` : `border-gray-200`}`}
+                                     className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.repeatPassword ? "border-red-400" : "border-slate-300"}`}
+                                     placeholder="Reintrodu parola"
+                                     placeholderTextColor="#94a3b8"
                                      onChangeText={onChange}
                                      onBlur={onBlur}
                                      value={value}
@@ -318,22 +331,34 @@ const SignupPage = () => {
                                 </>
                             )}
                         />
-                        
-                        {errors.repeatPassword && (<Text className="text-red-500 text-sm mt-1 ml-1">{errors.repeatPassword.message}</Text>)}
+                         
+                        {errors.repeatPassword && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.repeatPassword.message}</Text>)}
 
                     </View>
 
                 <TouchableOpacity
-                    activeOpacity={0.7}
+                    activeOpacity={0.8}
                     onPress={handleSubmit(onSubmit)}
-                    className="bg-blue-600 py-4 rounded-xl mt-4 items-center shadow-md"
+                    className="mt-2 items-center rounded-xl bg-slate-900 py-3"
                 >
-                    <Text className="text-white text-lg font-bold">Submit</Text>
+                    <Text className="text-base font-semibold text-white">Creează cont</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => navigation.navigate("LoginPage")}
+                    className="mt-5 items-center"
+                >
+                    <Text className="text-sm text-slate-600">
+                        Ai deja cont? <Text className="font-semibold text-slate-900">Autentifică-te</Text>
+                    </Text>
+                </TouchableOpacity>
+                </View>
             </ScrollView> 
         </KeyboardAvoidingView>
     </SafeAreaView>
 
-)}
+    );
+}
 
 export default SignupPage;

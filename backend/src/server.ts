@@ -1,79 +1,43 @@
 import dotenv from 'dotenv';
 import express, {Request, Response} from "express";
 import cors from "cors";
-import multer from "multer";
-import OpenAI from 'openai';
-import fs from 'fs'
 
 dotenv.config();
 
-import pool from "./config/db";
-import { open } from 'fs';
+import { prisma } from "./config/db";
 
 import authRoutes from './routes/authRoutes'
+import voiceRoutes from './routes/voiceRoutes';
 
 const port = 5002;
-
-async function getUsers() {
-    const query = 'SELECT * FROM users';
-    try{
-        const data = await pool.query(query); 
-        return data.rows;
-    }
-    catch (error){
-        console.error("Eroare :", error);
-        throw error;
-    }
-}
 
 
 const app = express();
 app.use(cors());
 app.use(express.json()); 
 
-const storage = multer.diskStorage({
-    destination: 'uploads/',
-    filename: (req, file, cb) => {
-        const extension = file.originalname.split('.').pop();
-        cb(null, `${Date.now()}.${extension}`);
-    }
-});
 
-const upload = multer({ storage });
+// app.get('/', async (req: Request, res: Response) => {
+//     try {
+//         const allUsers = await prisma.users.findMany();
 
-app.post("/api/transcribe", upload.single('audio'), async (req: Request, res: Response) => {
+//         console.log("All users:", JSON.stringify(allUsers, null, 2));
 
-    if (!req.file){
-        return res.status(400).json({error: "Nu a fost gasit vreun fisier audio!"});
-    }
+//         return res.status(200).json({
+//             message: "Users fetched successfully",
+//             count: allUsers.length,
+//             users: allUsers,
+//         });
+//     } catch (error) {
+//         console.error("Failed to fetch users:", error);
+//         return res.status(500).json({ error: "Failed to fetch users" });
+//     }
+// });
 
-    console.log("Fisier primit:", req.file.filename, "Path:", req.file.path);
 
-    try{
+app.use('/api/auth', authRoutes);
 
-        const openai = new OpenAI({
-            apiKey: process.env.OPENAI_SECRET_KEY,
-        });
-
-        const response = await openai.audio.transcriptions.create({
-            file: fs.createReadStream(req.file.path),
-            model: 'whisper-1',
-            language: 'ro'
-        });
-        
-        fs.unlinkSync(req.file.path);
-
-        const textTranscris = response.text;
-        res.json({text: textTranscris});
-
-    } catch(err){
-        console.log("Eroare: ", err);
-        return res.status(500).json({error: "Eroare la transcriere"});
-    }
-
-});
-
-app.post('/api/register', authRoutes);
+app.use('/api/voice', voiceRoutes);
 // app.get('/', async (req: Request, res: Response) => {
 //     try {
 //         const users = await getUsers();

@@ -1,30 +1,39 @@
-import { Pool } from "pg";
+// import { Pool } from "pg";
 
+// const pool = new Pool({
 
-const pool = new Pool({
-
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASS,
-    port: Number(process.env.DB_PORT)
+//     user: process.env.DB_USER,
+//     host: process.env.DB_HOST,
+//     database: process.env.DB_NAME,
+//     password: process.env.DB_PASS,
+//     port: Number(process.env.DB_PORT)
     
-})
+// })
 
-async function verifyConnection(): Promise<void> {
+// async function verifyConnection(): Promise<void> {
 
-    try{
+//     try{
 
-        const client = pool.connect();
-        console.log('✅ Connected to PostgreSQL database');
-        (await client).release();
+//         const client = pool.connect();
+//         console.log('✅ Connected to PostgreSQL database');
+//         (await client).release();
 
-    }
-    catch (error){
-        console.error('❌ Error connecting to the database:', error)
-    }
-}
+//     }
+//     catch (error){
+//         console.error('❌ Error connecting to the database:', error)
+//     }
+// }
 
-verifyConnection();
+// verifyConnection();
 
-export default pool;
+// export default pool;
+
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../../generated/prisma/client";
+
+const connectionString = `${process.env.DATABASE_URL}`;
+
+const adapter = new PrismaPg({connectionString});
+const prisma = new PrismaClient({adapter});
+
+export { prisma };

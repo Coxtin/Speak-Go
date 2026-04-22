@@ -1,10 +1,11 @@
-import React, {useState, useEffect, useRef} from "react";
-import { Text, View, Button, TouchableOpacity, Platform, Alert, ActivityIndicator } from 'react-native'
-import { RecordingPresets, useAudioRecorder, useAudioRecorderState, AudioMode, AudioModule, setAudioModeAsync } from "expo-audio";
+import React, {useState} from "react";
+import { Text, View, TouchableOpacity, Platform, Alert, ActivityIndicator } from 'react-native'
+import { RecordingPresets, useAudioRecorder, AudioModule, setAudioModeAsync } from "expo-audio";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const API_URL = "http://192.168.1.133:5002/api/transcribe";
+import { apiFetch } from "../api/apiClient";
+
 
 const VoiceCommands = () => {
 
@@ -40,14 +41,21 @@ const VoiceCommands = () => {
     }
 
     const stopRecord = async() => {
+
         await audioRecorder.stop();
         setIsRecording(false);
 
-        console.log("De aici poti prelua fisierul: ", audioRecorder.uri);
-        console.log("Extensie fisier: ", audioRecorder.uri?.split('.').pop());
+        const recordedUri = audioRecorder.uri;
 
-        if (audioRecorder.uri)
-            await sendDataToBackend(audioRecorder.uri);
+        console.log("De aici poti prelua fisierul: ", recordedUri);
+        console.log("Extensie fisier: ", recordedUri?.split('.').pop());
+
+        if (!recordedUri) {
+            Alert.alert("Eroare", "Nu am putut salva înregistrarea audio.");
+            return;
+        }
+
+        await sendDataToBackend(recordedUri);
     }
 
     const sendDataToBackend = async (uri: string) => {
@@ -66,19 +74,19 @@ const VoiceCommands = () => {
                 type: `audio/${fileExtension || 'm4a'}`
             } as any);
 
-            console.log("Trimit catre backend la", API_URL);
-
-            const response = await fetch(API_URL, {
+            const response = await apiFetch('/voice', {
                 method: 'POST',
                 body: formData,
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => null);
 
-            if (response.ok){
-                console.log("Am primit textul!");
-                setTranscribedText(data.text);
+            if (!response.ok){
+                throw new Error(data?.error || "Nu am putut procesa audio-ul.");
             }
+
+            console.log("Am primit textul!");
+            setTranscribedText(data?.text || "");
 
         } catch(err){
             console.log("Eroare! Am primit: ", err);

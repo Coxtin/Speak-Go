@@ -1,7 +1,9 @@
-import React from 'react';
+import React , { useContext }from 'react';
 import {View, Text, TouchableOpacity, Button, Platform, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { AuthContext } from '../context/AuthContext';
 
 function showAlert(message: string){
     if (Platform.OS == 'web')
@@ -11,6 +13,8 @@ function showAlert(message: string){
 }
 
 const HomeScreen = () => {
+
+    const auth = useContext(AuthContext);
 
     const navigation = useNavigation<any>();
 
@@ -46,6 +50,14 @@ const HomeScreen = () => {
                 >
                     <Text className="text-white font-semibold text-lg text-center">Sign Up</Text>
                 </TouchableOpacity> 
+
+                <TouchableOpacity
+                    onPress={async () => await auth?.logout()}
+                    activeOpacity={0.7}
+                    className='bg-blue-500 px-6 py-3 rounded-xl w-64'
+                >
+                    <Text className='text-white font-semibold text-lg text-center'>Log Out</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
 

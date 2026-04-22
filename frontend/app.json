@@ -34,7 +34,8 @@
           "microphonePermission": "Allow Speak&Go to access your microphone."
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-secure-store"
     ]
   }
 }
