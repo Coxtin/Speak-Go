@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -7,70 +7,170 @@ datasource db {
   provider = "postgresql"
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model bookings {
-  id                Int       @id @default(autoincrement())
-  user_id           Int
-  event_id          Int
-  tickets_count     Int       @default(1)
-  total_price       Decimal   @db.Decimal(10, 2)
-  status            String?   @default("PENDING") @db.VarChar(20)
-  payment_intent_id String?   @db.VarChar(100)
-  created_at        DateTime? @default(now()) @db.Timestamp(6)
-  updated_at        DateTime? @default(now()) @db.Timestamp(6)
-  events            events    @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users             users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+// ==========================================
+// 1. UTILIZATORI & SECURITATE
+// ==========================================
 
-  @@index([event_id], map: "idx_bookings_event")
-  @@index([user_id], map: "idx_bookings_name")
-  @@index([status], map: "idx_bookings_status")
+model User {
+  id             Int          @id @default(autoincrement())
+  firstName      String       @map("firstname") @db.VarChar(50)
+  lastName       String       @map("lastname") @db.VarChar(50)
+  email          String       @unique @db.VarChar(100)
+  password       String       @db.VarChar(255)
+  username       String?      @db.VarChar(50)
+  birthDate      DateTime     @db.Date
+  profileImage   String?      @map("profile_image")
+  generatedNotes String?      @map("generated_notes") @db.Text
+  
+  createdAt      DateTime?    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime?    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  
+  bookings       Booking[]
+  resetCodes     ResetCode[]
+  reviews        Review[]
+
+  @@map("users")
 }
 
-model events {
-  id            Int        @id @default(autoincrement())
-  event_name    String     @db.VarChar(150)
-  description   String
-  category      String     @db.VarChar(50)
-  location      String     @db.VarChar(150)
-  event_date    DateTime   @db.Timestamp(6)
-  image_url     String?
-  status        String?    @default("ACTIVE") @db.VarChar(20)
-  price         Decimal    @default(0.00) @db.Decimal(10, 2)
-  currency      String?    @default("RON") @db.VarChar(3)
-  total_tickets Int
-  created_at    DateTime?  @default(now()) @db.Timestamp(6)
-  updated_at    DateTime?  @default(now()) @db.Timestamp(6)
-  bookings      bookings[]
-
-  @@index([category], map: "idx_event_category")
-  @@index([event_date], map: "idx_event_date")
-  @@index([event_name], map: "idx_event_title")
-}
-
-model reset_codes {
-  id         Int       @id @default(autoincrement())
-  user_id    Int
-  code       String    @db.VarChar(64)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  expired_at DateTime  @db.Timestamp(6)
-  used       Boolean?  @default(false)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model ResetCode {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  code      String    @db.VarChar(64)
+  used      Boolean?  @default(false)
+  expiredAt DateTime  @map("expired_at") @db.Timestamp(6)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([code], map: "idx_reset_codes")
+  @@map("reset_codes")
 }
 
-model users {
-  id              Int           @id @default(autoincrement())
-  firstname       String        @db.VarChar(50)
-  lastname        String        @db.VarChar(50)
-  email           String        @unique @db.VarChar(100)
-  password        String        @db.VarChar(255)
-  profile_image   String?
-  generated_notes String?
-  created_at      DateTime?     @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?     @default(now()) @db.Timestamp(6)
-  username        String?       @db.VarChar(50)
-  birthDate       DateTime
-  bookings        bookings[]
-  reset_codes     reset_codes[]
+// ==========================================
+// 2. EVENIMENTE & LOCAȚII
+// ==========================================
+
+model Venue {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(150)
+  city      String    @db.VarChar(100)
+  address   String    @db.Text
+  capacity  Int
+  
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  events    Event[]
+
+  @@index([city], map: "idx_venue_city")
+  @@map("venues")
+}
+
+model Event {
+  id          Int          @id @default(autoincrement())
+  title       String       @map("event_name") @db.VarChar(150)
+  description String       @db.Text
+  category    String       @db.VarChar(50)
+  date        DateTime     @map("event_date") @db.Timestamp(6)
+  imageUrl    String?      @map("image_url")
+  status      String?      @default("ACTIVE") @db.VarChar(20)
+  
+  venueId     Int          @map("venue_id")
+  venue       Venue        @relation(fields: [venueId], references: [id], onDelete: Restrict)
+  
+  createdAt   DateTime?    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime?    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  ticketTypes TicketType[]
+  reviews     Review[]
+  bookings    Booking[]
+
+  @@index([category], map: "idx_event_category")
+  @@index([date], map: "idx_event_date")
+  @@map("events")
+}
+
+// ==========================================
+// 3. STOCURI & PREȚURI
+// ==========================================
+
+model TicketType {
+  id                Int       @id @default(autoincrement())
+  eventId           Int       @map("event_id")
+  name              String    @db.VarChar(50) // ex: VIP, General Access, Early Bird
+  price             Decimal   @db.Decimal(10, 2)
+  currency          String?   @default("RON") @db.VarChar(3)
+  
+  totalCapacity     Int       @map("total_capacity")
+  availableCapacity Int       @map("available_capacity")
+
+  createdAt         DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  event             Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tickets           Ticket[]
+
+  @@map("ticket_types")
+}
+
+// ==========================================
+// 4. TRANZACȚII & BILETE GENERATE
+// ==========================================
+
+model Booking {
+  id              Int       @id @default(autoincrement())
+  userId          Int       @map("user_id")
+  eventId         Int       @map("event_id")
+  totalPrice      Decimal   @map("total_price") @db.Decimal(10, 2)
+  status          String?   @default("PENDING") @db.VarChar(20) // PENDING, PAID, CANCELLED
+  paymentIntentId String?   @map("payment_intent_id") @db.VarChar(100)
+
+  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tickets         Ticket[]
+
+  @@index([userId], map: "idx_bookings_user")
+  @@index([eventId], map: "idx_bookings_event")
+  @@index([status], map: "idx_bookings_status")
+  @@map("bookings")
+}
+
+model Ticket {
+  id           Int        @id @default(autoincrement())
+  qrCode       String     @unique @map("qr_code") @db.VarChar(255)
+  status       String?    @default("ACTIVE") @db.VarChar(20) // ACTIVE, SCANNED, REFUNDED
+  
+  bookingId    Int        @map("booking_id")
+  ticketTypeId Int        @map("ticket_type_id")
+
+  createdAt    DateTime?  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  booking      Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+
+  @@index([qrCode], map: "idx_tickets_qr")
+  @@map("tickets")
+}
+
+// ==========================================
+// 5. RECENZII & FEEDBACK
+// ==========================================
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  eventId   Int       @map("event_id")
+  rating    Int       @db.SmallInt // De la 1 la 5
+  comment   String?   @db.Text
+
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
 }

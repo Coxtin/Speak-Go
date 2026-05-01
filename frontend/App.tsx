@@ -10,8 +10,11 @@ import { AuthContext, AuthProvider } from './src/context/AuthContext';
  // Ecrane
 import HomeScreen from './src/main/HomeScreen';
 import VoiceCommands from './src/screens/TestingVoiceCommands';
-import LoginScreen from './src/screens/auth/LoginScreen'
-import SignUpScreen from './src/screens/auth/SignUpScreen'
+import LoginScreen from './src/screens/auth/LoginScreen';
+import SignUpScreen from './src/screens/auth/SignUpScreen';
+import ResetPasswordScreen from './src/screens/auth/ResetPasswordScreen'
+import InsertResetCodeScreen from './src/screens/auth/InsertResetCodeScreen';
+import ModifyPasswordScreen from './src/screens/auth/ModifyPasswordScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -77,6 +80,38 @@ const RootNavigator = () => {
                             headerShown: true 
                         }}
                     />
+
+                    <Stack.Screen
+                        name="ResetPasswordScreen"
+                        component={ResetPasswordScreen}
+                        options={{
+                            title: 'Reseteaza parola',
+                            headerStyle: {backgroundColor: 'green'},
+                            headerTintColor: "#fff",
+                            headerShown: true,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="InsertResetCodeScreen"
+                        component={InsertResetCodeScreen}
+                        options={{
+                            title: 'Introdu codul',
+                            headerStyle: {backgroundColor: 'green'},
+                            headerTintColor: "#fff",
+                            headerShown: true,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="ModifyPasswordScreen"
+                        component={ModifyPasswordScreen}
+                        options={{
+                            title: 'Modifica parola',
+                            headerStyle: {backgroundColor: 'green'},
+                            headerTintColor: "#fff",
+                            headerShown: true,
+                        }}
+                    />
+
                 </>
             )}
         </Stack.Navigator>

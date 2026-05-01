@@ -39,6 +39,33 @@ export const loginSchema = z.object({
         .min(1, {message: "Campul parola este gol!"})
 })
 
+export const resetPasswordSchema = z.object({
+    email: z
+        .email({message: "Introdu o adresa de email valida!"})
+        .nonempty({message: "Campul email este gol"})
+})
+
+export const insertResetCodeSchema = z.object({
+    code: z
+        .string()
+        .regex(/^\d{6}$/, {message: "Codul trebuie sa contina exact 6 cifre!"}),
+})
+
+export const modifyPasswordSchema = z.object({
+    password: z
+        .string()
+        .min(8, {message: "Parola trebuie sa aiba cel putin 8 caractere!"})
+        .regex(/[A-Z]/, {message: "Parola trebuie sa contina cel putin o litera mare!"})
+        .regex(/[0-9]/, {message: "Parola trebuie sa contina cel putin o cifra!"})
+        .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie sa contina cel putin un caracter special!"}),
+    repeatPassword: z
+        .string()
+        .nonempty({message: "Reintrodu parola!"})
+}).refine((data) => data.password === data.repeatPassword, {message: "Parolele nu coincid!", path: ["repeatPassword"]})
+
 
 export type SignUpFormValues = z.infer<typeof signupSchema>
 export type LoginFormValues = z.infer<typeof loginSchema>
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
+export type InsertResetCodeValues = z.infer<typeof insertResetCodeSchema>
+export type ModifyPasswordValues = z.infer<typeof modifyPasswordSchema>

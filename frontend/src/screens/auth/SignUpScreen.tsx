@@ -140,7 +140,7 @@ const SignupPage = () => {
                                 <Text
                                      className="mb-2 text-sm text-slate-600"
                                 >
-                                    Utilizator
+                                    Username
                                 </Text>
 
                                 <TextInput

@@ -138,6 +138,21 @@ const LoginPage = () => {
                                 Nu ai cont? <Text className="font-semibold text-slate-900">Creează unul</Text>
                             </Text>
                         </TouchableOpacity>
+
+                        <TouchableOpacity
+                        
+                                activeOpacity={0.8}
+                                onPress={() => navigation.navigate("ResetPasswordScreen")}
+                                className="mt-5 items-center"
+                                
+                        >
+
+                                <Text className="text-sm text-slate-600">
+                                    Ai uitat parola? <Text className="font-semibold text-slate-900">Reseteaz-o!</Text>
+                                </Text>
+
+                        </TouchableOpacity>
+
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

@@ -1,12 +1,13 @@
 import * as secureStore from 'expo-secure-store';
+import { BASE_URL } from '../../config/config';
 
-const BASE_URL = 'http://192.168.1.133:5002/api';
+const API_BASE_URL = `${BASE_URL}/api`;
 
 export const apiFetch = async (endpoint: string, options: any = {}) => {
 
     const accesToken = await secureStore.getItemAsync('accesToken');
     const isFormDataBody = typeof FormData !== 'undefined' && options.body instanceof FormData;
-    const endpointUrl = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+    const endpointUrl = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
     const requestHeaders = {
         ...options.headers,
@@ -31,7 +32,7 @@ export const apiFetch = async (endpoint: string, options: any = {}) => {
 
         if (refreshToken){
 
-            const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+            const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
                 method: 'POST',
                 headers: {
                     'Content-Type' : 'application/json'

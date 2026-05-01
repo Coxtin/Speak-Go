@@ -3,3 +3,6 @@ node_modules
 /src/generated/prisma
 
 /generated/prisma
+
+prisma
+prisma_backup
