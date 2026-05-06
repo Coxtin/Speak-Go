@@ -120,10 +120,11 @@ export const sendResetCode = async (email: string) => {
        
         const findUser = await prisma.user.findUnique({
             where: { email: email },
-            select: { id: true }
+            select: { id: true, firstName: true }
         });
 
         const personId = findUser?.id;
+        const personName = findUser?.firstName;
 
         if (personId){
 
@@ -157,7 +158,7 @@ export const sendResetCode = async (email: string) => {
             const html = `
                 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
                     <h2 style="color: #1f2937; text-align: center; margin-bottom: 20px;">Resetare Parolă</h2>
-                    <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Salut,</p>
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Salut ${personName},</p>
                     <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Am primit o solicitare pentru resetarea parolei contului tău. Te rugăm să introduci codul de mai jos în aplicație pentru a continua procesul:</p>
                     
                     <div style="text-align: center; margin: 40px 0;">
@@ -166,6 +167,8 @@ export const sendResetCode = async (email: string) => {
                         </span>
                     </div>
                     
+                    <p style="color: #ef4444; font-size: 14px; text-align: center; font-weight: 500;">te pup pe portofel.</p>
+
                     <p style="color: #ef4444; font-size: 14px; text-align: center; font-weight: 500;">⏳ Acest cod este valabil doar 5 minute.</p>
                     <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
                     <p style="color: #9ca3af; font-size: 12px; text-align: center;">Dacă nu ai solicitat tu această resetare, te rugăm să ignori acest mesaj. Contul tău este în siguranță.</p>

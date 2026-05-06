@@ -8,6 +8,7 @@ import { prisma } from "./config/db";
 
 import authRoutes from './routes/authRoutes'
 import voiceRoutes from './routes/voiceRoutes';
+import aiRoutes from './routes/aiRoutes';
 
 const port = 5002;
 
@@ -38,6 +39,9 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 
 app.use('/api/voice', voiceRoutes);
+
+app.use('api/ai', aiRoutes);
+
 // app.get('/', async (req: Request, res: Response) => {
 //     try {
 //         const users = await getUsers();

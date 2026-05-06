@@ -35,6 +35,14 @@ const HomeScreen = () => {
                     <Text className="text-white font-semibold text-lg text-center">Demo Speech to Text</Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('TestingAIResponse')}
+                    activeOpacity={0.7}
+                    className='bg-blue-500 px-6 py-3 rounded-xl mb-4 w-64'
+                >
+                    <Text className='text-white font-semibold text-lg text-center'>Raspunsuri de la AI</Text>
+                </TouchableOpacity>
+
                 {/* <TouchableOpacity
                     onPress={() => navigation.navigate('LoginPage')}
                     activeOpacity={0.7}

@@ -15,6 +15,7 @@ import SignUpScreen from './src/screens/auth/SignUpScreen';
 import ResetPasswordScreen from './src/screens/auth/ResetPasswordScreen'
 import InsertResetCodeScreen from './src/screens/auth/InsertResetCodeScreen';
 import ModifyPasswordScreen from './src/screens/auth/ModifyPasswordScreen';
+import TestingAIReponse from './src/screens/test/TestingAIResponse'
 
 
 const Stack = createNativeStackNavigator();
@@ -55,6 +56,17 @@ const RootNavigator = () => {
                             headerTitleStyle: { fontWeight: 'bold' },
                             headerShown: true 
                         }} 
+                    />
+                    <Stack.Screen
+                        name="TestingAIResponse"
+                        component={TestingAIReponse}
+                        options={{
+                            title: "Testare Raspunsuri AI",
+                            headerStyle: { backgroundColor: '#f45qqe' },
+                            headerTintColor: '#fff',
+                            headerTitleStyle: { fontWeight: 'bold' },
+                            headerShown: true
+                        }}
                     />
                 </>
             ) : (

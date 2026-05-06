@@ -1,6 +1,5 @@
 import { Response, Request } from 'express';
 import * as authService from '../services/auth.service';
-//import { responseEncoding } from 'axios';
 
 const EMAIL_ALREADY_EXISTS_ERROR = "Exista deja un cont cu acest email!";
 const INVALID_CREDENTIALS_ERROR = "Email sau parola incorecta!";
