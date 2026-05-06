@@ -12,11 +12,16 @@ const TestingAIResponse = () => {
         // Alert.alert("Text trimis", inputText || "Nu ai introdus nimic.");
         try{
             const AIResponse = await transferCommand(inputText);
-            setAIMessage(AIResponse.action + "\n" + AIResponse.message);
+            const parsedMessage =
+                typeof AIResponse?.message === "string"
+                    ? AIResponse.message
+                    : JSON.stringify(AIResponse?.message ?? "", null, 2);
+
+            setAIMessage(`${AIResponse?.action ?? "unknown"}\n${parsedMessage}`);
         
         } catch (error: any){
             console.error("Eroare la receptarea mesajului de la ai");
-            throw error;
+            Alert.alert("Eroare", error?.message || "A aparut o problema la procesarea mesajului.");
         }
 
 

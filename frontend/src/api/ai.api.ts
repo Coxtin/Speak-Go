@@ -1,13 +1,4 @@
-import { BASE_URL } from "../../config/config";
 import { apiFetch } from "./apiClient";
-
-const parseJsonSafely = async (response: Response) => {
-    try {
-        return await response.json();
-    } catch {
-        return null;
-    }
-};
 
 export const transferCommand = async (command: string) => {
 
@@ -15,13 +6,13 @@ export const transferCommand = async (command: string) => {
 
         const response = await apiFetch('/ai', {
             method: 'POST',
-            body: command
+            body: JSON.stringify({ command })
         });
 
         const data = await response.json().catch(() => null);
 
         if (!response.ok){
-            throw new Error(data?.message || "Nu am putut prelua rezultatul de la AI");
+            throw new Error(data?.message || data?.error || "Nu am putut prelua rezultatul de la AI");
         }
 
         return data;

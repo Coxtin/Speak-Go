@@ -40,7 +40,7 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/voice', voiceRoutes);
 
-app.use('api/ai', aiRoutes);
+app.use('/api/ai', aiRoutes);
 
 // app.get('/', async (req: Request, res: Response) => {
 //     try {

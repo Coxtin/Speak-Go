@@ -166,8 +166,6 @@ export const sendResetCode = async (email: string) => {
                             ${code}
                         </span>
                     </div>
-                    
-                    <p style="color: #ef4444; font-size: 14px; text-align: center; font-weight: 500;">te pup pe portofel.</p>
 
                     <p style="color: #ef4444; font-size: 14px; text-align: center; font-weight: 500;">⏳ Acest cod este valabil doar 5 minute.</p>
                     <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
