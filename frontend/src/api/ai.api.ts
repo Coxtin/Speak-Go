@@ -1,12 +1,13 @@
 import { apiFetch } from "./apiClient";
+import { ChatCompletionMessageParam } from "../types/chatCompletionMessageParam";
 
-export const transferCommand = async (command: string) => {
+export const transferCommand = async (intent: ChatCompletionMessageParam[]) => {
 
     try {
 
         const response = await apiFetch('/ai', {
             method: 'POST',
-            body: JSON.stringify({ command })
+            body: JSON.stringify({ intent })
         });
 
         const data = await response.json().catch(() => null);
@@ -23,3 +24,4 @@ export const transferCommand = async (command: string) => {
     }
 
 }
+

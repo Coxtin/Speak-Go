@@ -40,7 +40,7 @@ const LoginPage = () => {
             console.log(response.data.refreshToken);
 
             await auth?.login(
-                response.data.accesToken,
+                response.data.accessToken,
                 response.data.refreshToken,
                 response.data.user,
             );

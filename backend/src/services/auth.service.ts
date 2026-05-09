@@ -74,7 +74,7 @@ export const loginUser = async (credentials: any) => {
             throw new Error(INVALID_CREDENTIALS_ERROR);
        } else {
 
-        const accesToken = jwt.sign({
+        const accessToken = jwt.sign({
 
             userId : person.id,
             email : person.email,
@@ -96,7 +96,7 @@ export const loginUser = async (credentials: any) => {
                 email: person.email,
                 username: person.username,
             },
-            accesToken: accesToken,
+            accessToken: accessToken,
             refreshToken: refreshToken    
         };
 
@@ -341,7 +341,7 @@ export const modifyPassword = async (newPassword: string, token: string) => {
     }
 }
 
-export const refreshAccesToken = async (refreshToken: string) => {
+export const refreshAccessToken = async (refreshToken: string) => {
 
     if (!refreshToken){
         throw new Error("Nu a fost trimis acel refreshToken!");
@@ -351,14 +351,18 @@ export const refreshAccesToken = async (refreshToken: string) => {
 
         const decodedUser = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET_KEY as string) as any;
 
-        const newAccesToken = jwt.sign({
-            userId: decodedUser.id,
-            email: decodedUser.email
-        }, process.env.JWT_REFRESH_SECRET_KEY as string, 
-        {expiresIn: '15m'});
+        if (decodedUser && decodedUser.userId){
 
-        return {accesToken: newAccesToken}
+            const newAccessToken = jwt.sign({
+                userId: decodedUser.userId,
+            }, process.env.JWT_SECRET_KEY as string, 
+            {expiresIn: '15m'});
 
+            return {value: true, accessToken: newAccessToken};
+    } else {
+        console.error("Nu s-a putut verifica refresh token-ul!");
+        return {value: false, message: "Date invalide în token. Vă rugăm să vă logați din nou!"};
+    }
     } catch (error){
         throw new Error("Din motive de securitate, te rugam sa te loghezi din nou!");
     }

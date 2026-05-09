@@ -4,18 +4,23 @@ import * as aiService from '../services/ai.service';
 export const convertText2Intent = async (req: Request, res: Response) => {
 
     try {
-        const { command } = req.body;
+        const { intent } = req.body;
 
-        const aiResult = await aiService.processUserCommand(command);
+        const aiResult = await aiService.processUserCommand(intent);
 
         if (!aiResult.value)
             return res.status(500).json({ message: aiResult.message });
 
         const data = aiResult.content;
 
-        if (data.intent === "greeting" || data.intent === "need_more_info") {
+        if (data.intent === "greeting") {
             const replyMessage = data.reply_message || data.intent_message;
             return res.status(200).json({ action: "speak", message: replyMessage });
+        }
+
+        else if (data.intent === "need_more_info"){
+            const replyMessage = data.reply_message || data.intent_message;
+            return res.status(200).json({action: "ask_for_info", message: replyMessage})
         }
 
         else if (data.intent === "search_events")

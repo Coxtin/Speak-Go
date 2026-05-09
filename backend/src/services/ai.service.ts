@@ -1,12 +1,13 @@
 import OpenAI from "openai";
 import { getEventSearchPrompt } from "../prompts/systemPrompts";
 import { prisma } from "../config/db";
+import { ChatCompletion, ChatCompletionDeveloperMessageParam, ChatCompletionMessageParam } from "openai/resources.js";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_SECRET_KEY,
 })
 
-export const processUserCommand = async (command: string) => {
+export const processUserCommand = async (conversationHistory: Array<ChatCompletionMessageParam>) => {
 
     try {
 
@@ -17,10 +18,7 @@ export const processUserCommand = async (command: string) => {
                 role: 'system',
                 content: getEventSearchPrompt()
             },
-            {
-                role: 'user',
-                content: command
-            }
+            ...conversationHistory
         ],
         response_format: {type: "json_object"},
         temperature: 0
@@ -45,3 +43,16 @@ export const processUserCommand = async (command: string) => {
     }
 
 }
+
+// export const command2Speech = async (command: string) => {
+
+//     try {
+
+//         const 
+
+//     } catch (error: any){
+//         console.error("Eroare: ", error);
+//         return {value: false};
+//     }
+
+// }

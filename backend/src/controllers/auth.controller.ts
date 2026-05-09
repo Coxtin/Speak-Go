@@ -70,7 +70,7 @@ export const checkResetCode = async (req: Request, res: Response) => {
         const result = await authService.verifyResetCode(email, code);
         
         if (result?.value === false)
-            return res.status(429).json({error: result.message});
+            return res.status(result?.status).json({error: result.message});
 
         return res.status(200).json({message: result.message, token: result.token});
 
@@ -109,14 +109,14 @@ export const resetPassword = async (req: Request, res: Response) => {
 
     } catch (error: any) {
 
-        console.error("Eroaer la controller-ul de modificare a parolei: ", error);
+        console.error("Eroare la controller-ul de modificare a parolei: ", error);
         return res.status(500).json({error: error});
 
     }
 
 }
 
-export const refreshAccesToken = async (req: Request, res: Response) => {
+export const refreshAccessToken = async (req: Request, res: Response) => {
 
     try {
 
@@ -125,9 +125,14 @@ export const refreshAccesToken = async (req: Request, res: Response) => {
         if (!token)
             return res.status(401).json({error: "Lipseste refresh token-ul!"});
 
-        const result = await authService.refreshAccesToken(token);
+        const result = await authService.refreshAccessToken(token);
 
-        return res.status(200).json(result);
+        if (result.value)
+
+            return res.status(200).json({accessToken: result.accessToken});
+
+        else
+            return res.status(401).json({message: result.message});
     
     } catch(error: any){
 

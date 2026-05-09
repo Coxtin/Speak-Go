@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { handleVoiceCommands } from "../controllers/voice.controller";
-import { authentificateToken } from "../middlewares/authentificateToken"
+import { authenticateToken } from "../middlewares/authenticateToken"
 
 const router = Router();
 
@@ -15,6 +15,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post('/', authentificateToken, upload.single('audio'), handleVoiceCommands);
+router.post('/', authenticateToken, upload.single('audio'), handleVoiceCommands);
 
 export default router;

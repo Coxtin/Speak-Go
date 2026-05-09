@@ -27,11 +27,11 @@ export const AuthProvider = ({ children } : {children: ReactNode}) => {
 
             try{
 
-                const storedAccesToken = await secureStore.getItemAsync('accesToken');
+                const storedAccessToken = await secureStore.getItemAsync('accessToken');
                 const storedRefreshToken = await secureStore.getItemAsync('refreshToken');
                 const storedUser = await secureStore.getItemAsync('userData');
 
-                if (storedAccesToken && storedRefreshToken && storedUser){
+                if (storedAccessToken && storedRefreshToken && storedUser){
 
                     setUser(JSON.parse(storedUser));
 
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children } : {children: ReactNode}) => {
 
     const login = async (token: string, refreshToken: string, userData: UserData) => {
 
-        await secureStore.setItemAsync('accesToken', token);
+        await secureStore.setItemAsync('accessToken', token);
         await secureStore.setItemAsync('refreshToken', refreshToken);
         await secureStore.setItemAsync('userData', JSON.stringify(userData));
         setUser(userData);
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children } : {children: ReactNode}) => {
 
     const logout = async () => {
 
-        await secureStore.deleteItemAsync('accesToken');
+        await secureStore.deleteItemAsync('accessToken');
         await secureStore.deleteItemAsync('refreshToken');
         await secureStore.deleteItemAsync('userData');
         setUser(null);

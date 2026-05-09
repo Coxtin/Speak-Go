@@ -5,13 +5,15 @@ const API_BASE_URL = `${BASE_URL}/api`;
 
 export const apiFetch = async (endpoint: string, options: any = {}) => {
 
-    const accesToken = await secureStore.getItemAsync('accesToken');
+    const accessToken =
+        (await secureStore.getItemAsync('accessToken')) ??
+        (await secureStore.getItemAsync('accesToken'));
     const isFormDataBody = typeof FormData !== 'undefined' && options.body instanceof FormData;
     const endpointUrl = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
     const requestHeaders = {
         ...options.headers,
-        ...(accesToken ? {'Authorization': `Bearer ${accesToken}`} : {}),
+        ...(accessToken ? {'Authorization': `Bearer ${accessToken}`} : {}),
     };
 
     if (isFormDataBody) {
@@ -42,11 +44,15 @@ export const apiFetch = async (endpoint: string, options: any = {}) => {
 
             if (refreshRes.ok){
 
-                const { accesToken: newAccesToken } = await refreshRes.json();
+                const { accessToken: newAccessToken } = await refreshRes.json();
 
-                await secureStore.setItemAsync('accesToken', newAccesToken);
+                if (typeof newAccessToken !== 'string')
+                    throw new Error("Access token invalid primit la refresh.");
 
-                config.headers['Authorization'] = `Bearer ${newAccesToken}`;
+                await secureStore.setItemAsync('accessToken', newAccessToken);
+                await secureStore.deleteItemAsync('accesToken');
+
+                config.headers['Authorization'] = `Bearer ${newAccessToken}`;
                 
                 return await fetch(endpointUrl, config);
             }
