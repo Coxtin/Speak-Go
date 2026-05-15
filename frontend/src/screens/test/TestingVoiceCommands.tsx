@@ -4,7 +4,7 @@ import { RecordingPresets, useAudioRecorder, AudioModule, setAudioModeAsync } fr
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { apiFetch } from "../api/apiClient";
+import { apiFetch } from "../../api/apiClient";
 
 
 const VoiceCommands = () => {
@@ -85,6 +85,7 @@ const VoiceCommands = () => {
                 throw new Error(data?.error || "Nu am putut procesa audio-ul.");
             }
 
+
             console.log("Am primit textul!");
             setTranscribedText(data?.text || "");
 
@@ -146,7 +147,7 @@ const VoiceCommands = () => {
                 >
                      <View className={`bg-white ${isRecording ? "w-8 h-8 rounded-sm" : "w-6 h-6 rounded-full"}`} />     
                 </TouchableOpacity>
-
+                
                 <Text className="mt-4 text-gray-500">
                     {isRecording ? "Se înregistrează..." : "Apasă pentru a vorbi"}
                 </Text>

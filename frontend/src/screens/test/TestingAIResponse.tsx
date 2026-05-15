@@ -22,7 +22,6 @@ const TestingAIResponse = () => {
 
             const AIResponse = await transferCommand(currentHistory);
 
-
             if (AIResponse.action === "ask_for_info"){
 
                 setChatHistory([...currentHistory, {role: 'assistant', content: JSON.stringify(AIResponse)}]);

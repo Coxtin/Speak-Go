@@ -44,15 +44,23 @@ export const processUserCommand = async (conversationHistory: Array<ChatCompleti
 
 }
 
-// export const command2Speech = async (command: string) => {
+export const TTS = async (command: string) => {
 
-//     try {
+    try {
 
-//         const 
+       const mp3 = await openai.audio.speech.create({
+            model: 'gpt-4o-mini-tts',
+            voice: 'alloy',
+            input: command
+       });
 
-//     } catch (error: any){
-//         console.error("Eroare: ", error);
-//         return {value: false};
-//     }
+       const buffer = Buffer.from(await mp3.arrayBuffer());
 
-// }
+       return {value: true, audioBuffer: buffer};
+
+    } catch (error: any){
+        console.error("Eroare: ", error);
+        return {value: false, message: "Nu am putut genera vocea"};
+    }
+
+}

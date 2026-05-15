@@ -1,76 +1,51 @@
-import React , { useContext }from 'react';
-import {View, Text, TouchableOpacity, Button, Platform, Alert} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+// screens/Main/HomeScreen.tsx
+import React, { useState, useContext } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AuthContext } from '../context/AuthContext'; 
 
-import { AuthContext } from '../context/AuthContext';
-
-function showAlert(message: string){
-    if (Platform.OS == 'web')
-        window.alert(message);
-    else
-        Alert.alert(message);
-}
+import { EventParams } from '../types/eventParams';
 
 const HomeScreen = () => {
-
     const auth = useContext(AuthContext);
 
-    const navigation = useNavigation<any>();
 
     return (
-
-        <SafeAreaView className="flex-1 bg-slate-100">
-            <View className="flex-1 items-center justify-center px-6">
-
-                <Text className="text-2xl font-bold text-gray-800 mb-8 text-center">
-                    Mergi la cautarea vocala!
+        <SafeAreaView className="flex-1 bg-slate-50">
+            {/* Header-ul paginii */}
+            <View className="px-6 py-4 flex-row justify-between items-center bg-white shadow-sm z-10">
+                <Text className="text-2xl font-bold text-gray-800">
+                    Evenimente noi 🔥
                 </Text>
-
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('TestingVoice')}
-                    activeOpacity={0.7}
-                    className='bg-blue-500 px-6 py-3 rounded-xl mb-4 w-64'
-                >
-                    <Text className="text-white font-semibold text-lg text-center">Demo Speech to Text</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('TestingAIResponse')}
-                    activeOpacity={0.7}
-                    className='bg-blue-500 px-6 py-3 rounded-xl mb-4 w-64'
-                >
-                    <Text className='text-white font-semibold text-lg text-center'>Raspunsuri de la AI</Text>
-                </TouchableOpacity>
-
-                {/* <TouchableOpacity
-                    onPress={() => navigation.navigate('LoginPage')}
-                    activeOpacity={0.7}
-                    className='bg-blue-500 px-6 py-3 rounded-xl mb-4 w-64'    
-                >
-                    <Text className="text-white font-semibold text-lg text-center">Login</Text>
-                </TouchableOpacity>   
-
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('SignupPage')}
-                    activeOpacity={0.7}
-                    className='bg-blue-500 px-6 py-3 rounded-xl w-64'    
-                >
-                    <Text className="text-white font-semibold text-lg text-center">Sign Up</Text>
-                </TouchableOpacity>  */}
-
-                <TouchableOpacity
-                    onPress={async () => await auth?.logout()}
-                    activeOpacity={0.7}
-                    className='bg-blue-500 px-6 py-3 rounded-xl w-64'
-                >
-                    <Text className='text-white font-semibold text-lg text-center'>Log Out</Text>
+                
+                {/* Am mutat butonul de Log Out aici sus temporar, sau îl poți pune în Profil */}
+                <TouchableOpacity onPress={async () => await auth?.logout()}>
+                    <Text className="text-red-500 font-semibold">Log Out</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Aici vor fi evenimentele din baza de date */}
+            <ScrollView className="flex-1 px-6 pt-4">
+                
+                {/* Card de test (Placeholder) */}
+                <View className="bg-white p-4 rounded-2xl shadow-sm mb-4 border border-gray-100">
+                    <View className="h-40 bg-gray-200 rounded-xl mb-3 items-center justify-center">
+                        <Text className="text-gray-400">Imagine Eveniment</Text>
+                    </View>
+                    <Text className="text-lg font-bold text-gray-800">Concert Rock Legends</Text>
+                    <Text className="text-gray-500 mb-2">București, Arenele Romane</Text>
+                    <View className="flex-row justify-between items-center mt-2">
+                        <Text className="text-blue-600 font-bold text-lg">150 RON</Text>
+                        <TouchableOpacity className="bg-blue-600 px-4 py-2 rounded-lg">
+                            <Text className="text-white font-semibold">Rezervă</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                {/* Sfârșit Card de test */}
+
+            </ScrollView>
         </SafeAreaView>
-
     );
-
-}
+};
 
 export default HomeScreen;

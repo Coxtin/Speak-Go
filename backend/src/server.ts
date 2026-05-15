@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import express, {Request, Response} from "express";
+import express from "express";
+import path from 'path';
 import cors from "cors";
 
 dotenv.config();
@@ -9,6 +10,7 @@ import { prisma } from "./config/db";
 import authRoutes from './routes/authRoutes'
 import voiceRoutes from './routes/voiceRoutes';
 import aiRoutes from './routes/aiRoutes';
+import eventRoutes from './routes/eventRoutes';
 
 const port = 5002;
 
@@ -42,6 +44,10 @@ app.use('/api/voice', voiceRoutes);
 
 app.use('/api/ai', aiRoutes);
 
+app.use('/api/events', eventRoutes);
+
+
+app.use('/uploads', express.static(path.join(__dirname, '../public/eventsImages')));
 // app.get('/', async (req: Request, res: Response) => {
 //     try {
 //         const users = await getUsers();

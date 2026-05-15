@@ -35,6 +35,7 @@ export const getEventSearchPrompt = () => {
     3. PENTRU CĂUTĂRI COMPLETE (unde avem suficiente detalii, ex: "Vreau la un concert rock" sau "Vreau la teatru de comedie"):
     {
         "intent": "search_events",
+        "reply_message": "[Aici generezi tu, ca asistent, un mesaj de confirmare, cum că ai găsit evenimente care corespund cerințelor utilizatorului]",
         "parameters": {
             "category": "teatru | concert | opera | stand-up | festival | all",
             "city": "Numele orașului extras sau null",

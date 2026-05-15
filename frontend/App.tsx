@@ -9,14 +9,15 @@ import { AuthContext, AuthProvider } from './src/context/AuthContext';
 
  // Ecrane
 import HomeScreen from './src/main/HomeScreen';
-import VoiceCommands from './src/screens/TestingVoiceCommands';
+import VoiceCommands from './src/screens/test/TestingVoiceCommands';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignUpScreen from './src/screens/auth/SignUpScreen';
 import ResetPasswordScreen from './src/screens/auth/ResetPasswordScreen'
 import InsertResetCodeScreen from './src/screens/auth/InsertResetCodeScreen';
 import ModifyPasswordScreen from './src/screens/auth/ModifyPasswordScreen';
 import TestingAIReponse from './src/screens/test/TestingAIResponse'
-
+import SearchEvents from './src/screens/main/SearchEvents';
+import MainTabNavigator from './src/navigation/MainNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,11 +43,12 @@ const RootNavigator = () => {
                 // 🟢 ECRANE PROTEJATE (Doar pentru utilizatori logați)
                 <>
                     <Stack.Screen 
-                        name="Home" 
-                        component={HomeScreen} 
-                        options={{ title: 'Acasă 🏠', headerShown: false }} 
+                        name="MainTabs" 
+                        component={MainTabNavigator} 
+                        options={{ headerShown: false }} 
                     />
-                    <Stack.Screen 
+                    
+                    {/* <Stack.Screen 
                         name="TestingVoice" 
                         component={VoiceCommands} 
                         options={{ 
@@ -68,6 +70,17 @@ const RootNavigator = () => {
                             headerShown: true
                         }}
                     />
+                    <Stack.Screen
+                        name="SearchEvents"
+                        component={SearchEvents}
+                        options={{
+                            title: "Testare Comanda -> Raspuns AI",
+                            headerStyle: { backgroundColor: '#f45qqe' },
+                            headerTintColor: '#fff',
+                            headerTitleStyle: { fontWeight: 'bold' },
+                            headerShown: true
+                        }}
+                    /> */}
                 </>
             ) : (
                 // 🔴 ECRANE PUBLICE (Doar pentru vizitatori)
