@@ -1,24 +1,52 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect, useCallback } from 'react';
+import { apiFetch } from '../api/apiClient';
 import { EventParams } from '../types/eventParams';
-
 
 export const useEvents = () => {
 
     const [events, setEvents] = useState<EventParams[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const fetchEvents = async() => {
+    const fetchEvents = useCallback(async () => {
 
         try {
 
-            //const 
+            setIsLoading(true);
+            setError(null);
 
-        } catch (error: any){
-            console.error("Eroare la prelucrarea evenimentelor din baza de date: ", error);
-            throw error;
+            const response = await apiFetch('/events');
+
+            if (!response.ok) {
+                throw new Error('Nu am putut prelua evenimentele!');
+            }
+
+            const data: { events: EventParams[] } = await response.json();
+            setEvents(data.events ?? []);
+        } catch (error: unknown) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : 'Eroare la preluarea evenimentelor din baza de date.';
+
+            console.error('Eroare la prelucrarea evenimentelor din baza de date: ', error);
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
         }
 
-    }
+    }, []);
+
+    useEffect(() => {
+        fetchEvents();
+    }, [fetchEvents]);
+
+    return {
+        events,
+        isLoading,
+        error,
+        refresh: fetchEvents,
+}
 
 }
+

@@ -1,9 +1,11 @@
 import { PrismaClientKnownRequestError } from "../../generated/prisma/internal/prismaNamespace"
 import { prisma } from "../config/db"
-import Prisma from '@prisma/client';
+import { Prisma, Venue } from "../../generated/prisma"
 // import { EventResponse } from "../types/event.types";
 
-export type EventResponse = Prisma.Event
+export type EventResponse = Prisma.EventGetPayload<{
+    include: { venue: true }
+}>;
 
 export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? : EventResponse[]}> => {
 
