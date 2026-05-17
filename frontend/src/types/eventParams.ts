@@ -13,6 +13,10 @@ export type EventParams = {
         city: string,
         address: string,
         capacity: number,
-    }
+    },
+    ticketTypes: {
+       price: number,
+       currency: string
+    }[];
 
-}
+};

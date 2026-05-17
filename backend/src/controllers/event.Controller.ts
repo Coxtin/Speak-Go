@@ -8,6 +8,12 @@ export const fetchEvents = async(req: Request, res: Response) => {
         const response = await eventService.fetchDataBaseForEvents();
 
         if (response.value === true && response.events){
+            const firstEvent = response.events[0];
+            console.log(
+                "[fetchEvents] Primul eveniment chei:",
+                firstEvent ? Object.keys(firstEvent) : "N/A"
+            );
+            console.log("[fetchEvents] Primul eveniment ticketTypes:", firstEvent?.ticketTypes);
 
             return res.status(200).json({events: response.events})
 

@@ -12,6 +12,12 @@ export interface EventResponse {
         city: string,
         address: string,
         capacity: number
-    }
+    },
+    ticketTypes: {
+        id: number,
+        name: string,
+        price: number,
+        quantity: number,
+    }[];
 
 }

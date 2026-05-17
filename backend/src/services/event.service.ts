@@ -1,10 +1,10 @@
 import { PrismaClientKnownRequestError } from "../../generated/prisma/internal/prismaNamespace"
 import { prisma } from "../config/db"
-import { Prisma, Venue } from "../../generated/prisma"
+import { Prisma } from "../../generated/prisma"
 // import { EventResponse } from "../types/event.types";
 
 export type EventResponse = Prisma.EventGetPayload<{
-    include: { venue: true }
+    include: { venue: true, ticketTypes: {select: { price: true, currency: true } } }
 }>;
 
 export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? : EventResponse[]}> => {
@@ -13,7 +13,16 @@ export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? 
 
         const events = await prisma.event.findMany({
             include: {
-                venue: true
+                venue: true,
+                ticketTypes: {
+                    select: {
+                        price: true,
+                        currency: true
+                    }
+                }
+            },
+            orderBy: {
+                title: 'desc'
             }
         });
 

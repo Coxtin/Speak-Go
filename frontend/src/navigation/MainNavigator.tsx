@@ -1,9 +1,9 @@
 // navigation/MainTabNavigator.tsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
-
+import { AuthContext } from '../context/AuthContext';
 // Importăm ecranele tale
 import HomeScreen from '../main/HomeScreen'; 
 import SearchEvents from '../screens/main/SearchEvents'; 
@@ -12,11 +12,26 @@ import SearchEvents from '../screens/main/SearchEvents';
 const Tab = createBottomTabNavigator();
 
 // Un ecran temporar de Profil până îl construiești pe cel real
-const DummyProfile = () => (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Ecranul de Profil (În curând)</Text>
-    </View>
-);
+const DummyProfile = () => {
+
+    const auth = useContext(AuthContext);
+
+    return (
+
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Ecranul de Profil (În curând)</Text>
+            <View>
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={auth?.logout}
+                >
+                    <Text className='color-red-500 font-bold px-4 py-4 bg-slate-900 border rounded-xl'>LogOut</Text>    
+                </TouchableOpacity>
+            </View>
+        </View>
+
+    )
+};
 
 const MainTabNavigator = () => {
 

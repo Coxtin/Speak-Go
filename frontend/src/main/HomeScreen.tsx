@@ -10,7 +10,10 @@ import { EventParams } from '../types/eventParams';
 const HomeScreen = () => {
     
     const auth = useContext(AuthContext);
+    
     const { events, isLoading, error, refresh } = useEvents();
+
+    //console.log("Date primite de la Backend: ", JSON.stringify(events, null, 2));
 
     if (isLoading && events.length === 0){
         return (
@@ -35,6 +38,14 @@ const HomeScreen = () => {
     const renderEventCard = ({ item }: { item: EventParams }) => {
         // Combinăm BASE_URL cu ruta relativă salvată în baza de date (/uploads/nume_poza.jpg)
         const fullImageUrl = item.imageUrl ? `${BASE_URL}${item.imageUrl}` : null;
+
+        const prices =
+            item.ticketTypes
+                ?.map((t) => Number(String(t.price).replace(',', '.')))
+                .filter((price) => Number.isFinite(price)) || [];
+
+        const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+        const currency = item.ticketTypes?.map((t => t.currency))
 
         return (
             <TouchableOpacity 
@@ -95,7 +106,9 @@ const HomeScreen = () => {
                         {/* Buton simulat / Preț */}
                         <View className="bg-slate-900 px-4 py-2.5 rounded-xl">
                             <Text className="text-white font-bold text-center">
-                                Detalii
+                                {minPrice !== null
+                                    ? `Preț bilet - ${minPrice.toLocaleString('ro-RO')} ${currency[0]} `
+                                    : 'Preț indisponibil'}
                             </Text>
                         </View>
                     </View>

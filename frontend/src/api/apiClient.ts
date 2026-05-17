@@ -10,6 +10,7 @@ export const apiFetch = async (endpoint: string, options: any = {}) => {
         (await secureStore.getItemAsync('accesToken'));
     const isFormDataBody = typeof FormData !== 'undefined' && options.body instanceof FormData;
     const endpointUrl = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    console.log('[apiFetch] Request URL:', endpointUrl);
 
     const requestHeaders = {
         ...options.headers,
