@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useSpeechToText } from '../../hooks/useSpeechToText';
 import { useAiChat } from '../../hooks/useAiChat';
 
 
-const SearchEvents = () => {
+type SearchEventsProps = {
+    inModal?: boolean;
+};
+
+const SearchEvents = ({ inModal = false }: SearchEventsProps) => {
 
 
     const { startRecording, stopRecording, isRecording, isProcessingSTT } = useSpeechToText(); 
-    const { chatHistory, aiMessage, isAiThinking, processUserMessage, resetChat } = useAiChat();
+    const { aiMessage, isAiThinking, processUserMessage, resetChat } = useAiChat();
     
     const handleVoiceCommand = async () => {
         // Oprește microfonul și așteaptă textul transcris de Whisper
@@ -25,13 +28,11 @@ const SearchEvents = () => {
     const isBusy = isProcessingSTT || isAiThinking;
 
     return (
-        <SafeAreaView className="flex-1 bg-white items-center justify-center px-6">
-            <Text className="text-2xl font-bold text-gray-800 mb-8 text-center">
-                Spune-mi ce cauți 🎤
-            </Text>
 
+        <View className={`flex-1 w-full items-center justify-between ${inModal ? 'pb-2' : 'px-5 pb-6 pt-4'}`}>
+           
             {/* Fereastra de Răspuns AI */}
-            <View className="bg-blue-50 w-full p-6 rounded-2xl min-h-[120px] mb-10 justify-center items-center border border-blue-100 shadow-sm">
+            <View className="w-full bg-blue-50 p-4 rounded-2xl mt-2 border border-blue-100">
                 {isBusy ? (
                     <View className="items-center">
                         <ActivityIndicator size="large" color="#2563EB" />
@@ -62,17 +63,17 @@ const SearchEvents = () => {
             <View className={`bg-white ${isRecording ? "w-8 h-8 rounded-md" : "w-6 h-6 rounded-full"}`} />     
             </TouchableOpacity>
 
-            <Text className="mt-6 text-gray-500 font-medium">
+            <Text className="mt-6 text-gray-500 font-medium text-center">
                 {isRecording ? "Ascult... (Apasă pentru a trimite)" : "Apasă pentru a vorbi"}
             </Text>
 
             {/* Buton opțional de resetare a conversației */}
             {aiMessage ? (
-                <TouchableOpacity onPress={resetChat} className="mt-8 px-4 py-2">
+                <TouchableOpacity onPress={resetChat} className="mt-4 px-4 py-2">
                     <Text className="text-gray-400 font-bold">Resetează conversația</Text>
                 </TouchableOpacity>
             ) : null}
-        </SafeAreaView>
+        </View>
     );
 }
 

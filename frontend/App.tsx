@@ -5,7 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import "./global.css"; 
 
+//Contexte
 import { AuthContext, AuthProvider } from './src/context/AuthContext';
+import { ModalContext, ModalProvider } from './src/context/ModalContext';
 
  // Ecrane
 import HomeScreen from './src/main/HomeScreen';
@@ -18,6 +20,8 @@ import ModifyPasswordScreen from './src/screens/auth/ModifyPasswordScreen';
 import TestingAIReponse from './src/screens/test/TestingAIResponse'
 import SearchEvents from './src/screens/main/SearchEvents';
 import MainTabNavigator from './src/navigation/MainNavigator';
+import GlobalModal from './src/components/GlobalModal';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -161,7 +165,10 @@ export default function App() {
     <SafeAreaProvider>
       <AuthProvider>
         <NavigationContainer>
-            <RootNavigator />
+            <ModalProvider>
+               <GlobalModal />
+               <RootNavigator />
+            </ModalProvider>
         </NavigationContainer>
       </AuthProvider>
     </SafeAreaProvider>

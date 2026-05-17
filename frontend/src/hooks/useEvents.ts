@@ -15,7 +15,7 @@ export const useEvents = () => {
 
             setIsLoading(true);
             setError(null);
-            console.log('[useEvents] Endpoint:', `${BASE_URL}/api/events`);
+            //console.log('[useEvents] Endpoint:', `${BASE_URL}/api/events`);
 
             const response = await apiFetch('/events');
 
@@ -25,8 +25,8 @@ export const useEvents = () => {
 
             const data: { events: EventParams[] } = await response.json();
             const firstEvent = data.events?.[0];
-            console.log('[useEvents] Primul eveniment chei:', firstEvent ? Object.keys(firstEvent) : 'N/A');
-            console.log('[useEvents] Primul eveniment ticketTypes:', firstEvent?.ticketTypes);
+            //console.log('[useEvents] Primul eveniment chei:', firstEvent ? Object.keys(firstEvent) : 'N/A');
+            //console.log('[useEvents] Primul eveniment ticketTypes:', firstEvent?.ticketTypes);
             setEvents(data.events ?? []);
         } catch (error: unknown) {
             const errorMessage =

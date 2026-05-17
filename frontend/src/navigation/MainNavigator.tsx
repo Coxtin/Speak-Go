@@ -25,7 +25,12 @@ const DummyProfile = () => {
                     activeOpacity={0.7}
                     onPress={auth?.logout}
                 >
-                    <Text className='color-red-500 font-bold px-4 py-4 bg-slate-900 border rounded-xl'>LogOut</Text>    
+                    <Text className='color-red-500 font-bold px-4 py-4 bg-slate-900 border rounded-xl'>LogOut</Text> 
+                    <Ionicons
+                        name="log-out-outline"
+                        color="red"
+                        size={22}
+                    />   
                 </TouchableOpacity>
             </View>
         </View>

@@ -1,18 +1,24 @@
 // screens/Main/HomeScreen.tsx
 import React, { useState, useContext } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext'; 
 import { useEvents } from '../hooks/useEvents';
 import { BASE_URL } from '../../config/config';
+import { Ionicons } from '@expo/vector-icons';
 import { EventParams } from '../types/eventParams';
+import { ModalContext } from '../context/ModalContext';
+import SearchEvents from '../screens/main/SearchEvents';
 
 const HomeScreen = () => {
     
     const auth = useContext(AuthContext);
+    const modal = useContext(ModalContext);
+
+    const openModal = modal?.openModal;
     
     const { events, isLoading, error, refresh } = useEvents();
-
+    const [text, setText] = useState<string>("");
     //console.log("Date primite de la Backend: ", JSON.stringify(events, null, 2));
 
     if (isLoading && events.length === 0){
@@ -118,42 +124,108 @@ const HomeScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-50">
-            {/* Header personalizat de sus */}
-            <View className="px-6 pt-4 pb-3 bg-white border-b border-gray-100 flex-row justify-between items-center">
-                <View>
-                    <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest">Descoperă</Text>
-                    <Text className="text-2xl font-black text-slate-800">Evenimente Noi 🔥</Text>
-                </View>
-            </View>
+        <SafeAreaView
+            className="flex-1 bg-slate-50"
+            edges={['top', 'left', 'right']}
+        >
+            <KeyboardAvoidingView
+                style = {{flex: 1}}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <View
+                    className='flex-1 relative'
+                >
+                {/* Header personalizat de sus */}
+                    <View className="px-6 pt-4 pb-3 bg-white border-b border-gray-100 flex-row justify-between items-center">
+                        <View>
+                            <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest">Descoperă</Text>
+                            <Text className="text-2xl font-black text-slate-800">Evenimente Noi 🔥</Text>
 
-            {/* Listarea eficientă cu FlatList */}
-            <FlatList
-                data={events}
-                renderItem={renderEventCard}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 40 }}
-                showsVerticalScrollIndicator={false}
-                
-                // Pull to Refresh: Când utilizatorul trage în jos de listă, se re-execută funcția refresh
-                refreshControl={
-                    <RefreshControl 
-                        refreshing={isLoading} 
-                        onRefresh={refresh} 
-                        colors={["#2563EB"]} // Pentru Android
-                        tintColor="#2563EB"  // Pentru iOS
-                    />
-                }
-
-                // Ce se afișează dacă baza de date este goală
-                ListEmptyComponent={() => (
-                    <View className="flex-1 items-center justify-center py-20">
-                        <Text className="text-gray-400 text-lg font-medium text-center">
-                            Momentan nu există evenimente disponibile.
-                        </Text>
+                        </View>
                     </View>
-                )}
-            />
+
+                    {/* Listarea eficientă cu FlatList */}
+                    <FlatList
+                        data={events}
+                        renderItem={renderEventCard}
+                        keyExtractor={(item) => item.id.toString()}
+                        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 100 }}
+                        showsVerticalScrollIndicator={false}
+                        keyboardDismissMode='on-drag'
+                        
+                        // Pull to Refresh: Când utilizatorul trage în jos de listă, se re-execută funcția refresh
+                        refreshControl={
+                            <RefreshControl 
+                                refreshing={isLoading} 
+                                onRefresh={refresh} 
+                                colors={["#2563EB"]} // Pentru Android
+                                tintColor="#2563EB"  // Pentru iOS
+                            />
+                        }
+
+                        // Ce se afișează dacă baza de date este goală
+                        ListEmptyComponent={() => (
+                            <View className="flex-1 items-center justify-center py-20">
+                                <Text className="text-gray-400 text-lg font-medium text-center">
+                                    Momentan nu există evenimente disponibile.
+                                </Text>
+                            </View>
+                        )}
+                    />
+
+                    <View
+                        className='absolute bottom-6 left-5 right-5 bg-white rounded-xl shadow-2xl flex-row items-center px-4 py-2.5 border border-gray-100 elevation-5'
+                    >
+                        <Ionicons
+                            name="search-outline"
+                            size={20}
+                            color="#9CA3AF"
+                        />
+
+                        <TextInput
+                            placeholder='Spune sau scrie ce cauti'
+                            placeholderTextColor="#9CA3AF"
+                            className='flex-1 ml-3 text-base text-gray-800'
+                            onChangeText={setText}
+                            value={text}
+                        />
+                        
+                        {text ? (
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => Alert.alert("caut evenimente...")}
+                                className='bg-blue p-3 rounded-full ml-2 shadow-md flex-row items-center justify-center'
+                            >
+                                <Ionicons
+                                    name="send-outline"
+                                    color="blue"
+                                    size={22}
+                                />
+                            </TouchableOpacity>
+                        )
+                        : (
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => { 
+                                    if (openModal){
+                                        console.log("am apasat");
+                                        openModal(<SearchEvents />);
+                                    }
+                                 }}
+                                className='bg-blue p-3 rounded-full ml-2 shadow-md flex-row items-center justify-center'
+                            >
+                                <Ionicons
+                                    name="mic"
+                                    color="blue"
+                                    size={22}
+                                />
+                            </TouchableOpacity>
+                        )}
+
+                    
+                    </View>
+                </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };
