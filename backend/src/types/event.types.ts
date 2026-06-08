@@ -21,3 +21,15 @@ export interface EventResponse {
     }[];
 
 }
+
+export interface EventFilter  {
+    
+    category?: string
+    genres?: string,
+    city?: string,
+    artist?: string,
+    eventName?: string,
+    date_from?: Date,
+    date_to?: Date
+    
+}

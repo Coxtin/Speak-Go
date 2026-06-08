@@ -5,8 +5,10 @@ export const convertText2Intent = async (req: Request, res: Response) => {
 
     try {
         const { intent } = req.body;
+        console.log("[AI Controller] /api/ai payload intent:", intent);
 
         const aiResult = await aiService.processUserCommand(intent);
+        console.log("[AI Controller] aiResult:", aiResult);
 
         if (!aiResult.value)
             return res.status(500).json({ message: aiResult.message });
@@ -24,7 +26,7 @@ export const convertText2Intent = async (req: Request, res: Response) => {
         }
 
         else if (data.intent === "search_events")
-            return res.status(200).json({action: "search_event", message: data.parameters});
+            return res.status(200).json({action: "search_event", parameters: data.parameters});
 
         return res.status(400).json({action: "no_action", message: "Intent necunoscut primit de la AI." });
 

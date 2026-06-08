@@ -31,7 +31,7 @@ export const getAudio = async ( text: string ): Promise <string | null> => {
 
     try {
 
-        if (!text?.trim()) {
+        if (!text) {
             throw new Error("Mesajul pentru conversia TTS este obligatoriu.");
         }
 

@@ -9,11 +9,11 @@ export const fetchEvents = async(req: Request, res: Response) => {
 
         if (response.value === true && response.events){
             const firstEvent = response.events[0];
-            console.log(
-                "[fetchEvents] Primul eveniment chei:",
-                firstEvent ? Object.keys(firstEvent) : "N/A"
-            );
-            console.log("[fetchEvents] Primul eveniment ticketTypes:", firstEvent?.ticketTypes);
+            // console.log(
+            //     "[fetchEvents] Primul eveniment chei:",
+            //     firstEvent ? Object.keys(firstEvent) : "N/A"
+            // );
+            //console.log("[fetchEvents] Primul eveniment ticketTypes:", firstEvent?.ticketTypes);
 
             return res.status(200).json({events: response.events})
 
@@ -24,6 +24,41 @@ export const fetchEvents = async(req: Request, res: Response) => {
     } catch (error: any){
         console.error("Eroare la incarcarea evenimentelor: ", error);
         return res.status(401).json({message: "Nu s-au putut incarca evenimentele! Va rugam, incercati mai tarziu!"});
+    }
+
+}
+
+export const searchEvent = async (req: Request, res: Response) => {
+
+    try {
+
+        const { filters } = req.body;
+
+        console.log("Filtrele primite: ", filters);
+
+        const response = await eventService.searchEventsByFilters(filters);
+
+        if (response?.value === false && response?.events === null){
+
+            return res.status(404).json({message: "Nu exista evenimente care sa corespunda cautarii dvs."});
+
+        } else if (response?.value === false && response.message){
+
+            return res.status(501).json({ message: response.message })
+
+        } else {
+
+            console.log("Trimit evenimentele gasite dupa filtre...");
+
+            console.log("Trimit inapoi", response.filteredEvents);
+
+            return res.status(200).json({message: "Evenimente care corespund cautarii dvs.", events: response.filteredEvents})
+        }
+    } catch (error: any){
+
+        console.error("Eroare la cautarea evenimentelor: ", error);
+        return res.status(401).json({message: "Nu am putut filtra evenimentele! Va rugam, incercati mai tarziu!"});
+
     }
 
 }

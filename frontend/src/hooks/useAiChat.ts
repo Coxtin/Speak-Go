@@ -14,7 +14,7 @@ export const useAiChat = () => {
     const audioPlayer = useAudioPlayer();
     
     const processUserMessage = async (text: string) => {
-        if (!text.trim()) return null;
+        if (!text) return null;
 
         setIsAiThinking(true);
 
@@ -45,7 +45,7 @@ export const useAiChat = () => {
 
             setAiMessage(`${displayText} \n\n ${AIResponse.action}`);
 
-            if (AIResponse.message && AIResponse.action != "search_events"){
+            if (AIResponse.message && AIResponse.action != "search_event"){
 
                 const audioURI = await getAudio(AIResponse.message);
                 

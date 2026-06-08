@@ -11,8 +11,10 @@ export const getEventSearchPrompt = () => {
     Folosește această dată ca punct de referință absolut pentru a calcula zilele relative (ex: dacă utilizatorul spune "mâine", "weekend-ul acesta", "săptămâna viitoare", calculează și returnează date calendaristice exacte în format YYYY-MM-DD).
 
     REGULA DE RAFINARE A CĂUTĂRII (SLOT FILLING):
-    Dacă utilizatorul cere o categorie generică (ex: doar "concert" sau doar "teatru"), dar NU specifică genul (ex: rock, trap, comedie, dramă), NU face căutarea direct. În schimb, folosește intent-ul "need_more_info" și întreabă-l politicos ce gen preferă.
-    La fel și pentru oraș: dacă nu deduce orașul din context, trebuie să îl ceară. Dacă lipsesc ambele, formulează o întrebare naturală care să le ceară pe amândouă sau ia-le pe rând.
+    1. CĂUTARE DIRECTĂ: Dacă utilizatorul oferă un NUME DE EVENIMENT (ex: "Untold") sau un ARTIST (ex: "Eminem"), ai suficiente date! Treci direct la căutare. NU mai cere alte informații.
+    2. SUFICIENT PENTRU CĂUTARE: Dacă utilizatorul specifică CATEGORIA și ORAȘUL (ex: "festival în Cluj", "concert în București") SAU numele artistului/trupei (ex: "Vreau la un concert la Eminem"), este suficient. Treci direct la căutare. NU îl obliga să aleagă genul muzical dacă nu a specificat.
+    3. PREFERINȚE GENERICE: Dacă utilizatorul menționează că "nu contează", "orice" sau "nu-mi pasă" despre un anumit filtru (gen, locație), respectă-i dorința și treci la căutare ignorând acel filtru.
+    4. CÂND SĂ CERI DETALII (need_more_info): Folosește acest intent DOAR dacă cererea este extrem de vagă și nu ai aproape niciun filtru clar (ex: utilizatorul spune DOAR "Vreau să merg la un concert", dar nu știi nici orașul, nici artistul, nici data).
 
     REGULA DE BAZĂ:
     Returnează STRICT un obiect JSON valid. Nu folosi formatare markdown (fără \`\`\`json), nu oferi explicații în afara JSON-ului și nu include comentarii (//) în interiorul JSON-ului returnat.
@@ -38,6 +40,7 @@ export const getEventSearchPrompt = () => {
         "reply_message": "[Aici generezi tu, ca asistent, un mesaj de confirmare, cum că ai găsit evenimente care corespund cerințelor utilizatorului]",
         "parameters": {
             "category": "teatru | concert | opera | stand-up | festival | all",
+            "genre": "Genul muzical (ex: Rock, Pop, Electronic, etc) sau tipul spectacolului (ex: Comedie, Dramă) extras sau null"
             "city": "Numele orașului extras sau null",
             "artist": "Numele artistului extras sau null",
             "eventName": "Numele specific al evenimentului extras sau null",

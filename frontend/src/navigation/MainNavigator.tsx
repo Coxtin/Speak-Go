@@ -66,7 +66,7 @@ const MainTabNavigator = () => {
             })}
         >
             <Tab.Screen name="Acasă" component={HomeScreen} />
-            <Tab.Screen name="Caută" component={SearchEvents} />
+            {/* <Tab.Screen name="Caută" component={SearchEvents} /> */}
             <Tab.Screen name="Profil" component={DummyProfile} />
         </Tab.Navigator>
     );

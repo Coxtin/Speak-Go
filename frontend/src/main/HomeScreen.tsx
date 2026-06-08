@@ -8,6 +8,7 @@ import { BASE_URL } from '../../config/config';
 import { Ionicons } from '@expo/vector-icons';
 import { EventParams } from '../types/eventParams';
 import { ModalContext } from '../context/ModalContext';
+import { EventFilter } from '../types/EventFilter';
 import SearchEvents from '../screens/main/SearchEvents';
 
 const HomeScreen = () => {
@@ -17,7 +18,7 @@ const HomeScreen = () => {
 
     const openModal = modal?.openModal;
     
-    const { events, isLoading, error, refresh } = useEvents();
+    const { events, isLoading, error, fetchFilteredEvents , refresh } = useEvents();
     const [text, setText] = useState<string>("");
     //console.log("Date primite de la Backend: ", JSON.stringify(events, null, 2));
 
@@ -193,7 +194,14 @@ const HomeScreen = () => {
                         {text ? (
                             <TouchableOpacity
                                 activeOpacity={0.7}
-                                onPress={() => Alert.alert("caut evenimente...")}
+                                onPress={() => {
+                                    if (openModal){
+                                        openModal(<SearchEvents 
+                                            inModal={true}
+                                            closeModal={modal.visible}
+                                        />)
+                                    }
+                                }}
                                 className='bg-blue p-3 rounded-full ml-2 shadow-md flex-row items-center justify-center'
                             >
                                 <Ionicons
@@ -207,9 +215,13 @@ const HomeScreen = () => {
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 onPress={() => { 
-                                    if (openModal){
+                                    if (openModal && !modal?.visible){
                                         console.log("am apasat");
-                                        openModal(<SearchEvents />);
+                                        openModal(<SearchEvents 
+                                            inModal={true}
+                                            onSearchReady={fetchFilteredEvents}
+                                            closeModal={modal.visible}
+                                        />);
                                     }
                                  }}
                                 className='bg-blue p-3 rounded-full ml-2 shadow-md flex-row items-center justify-center'
@@ -231,3 +243,4 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
