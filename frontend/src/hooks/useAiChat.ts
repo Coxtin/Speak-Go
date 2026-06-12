@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { ChatCompletionMessageParam } from '../types/chatCompletionMessageParam'; 
 import { transferCommand, getAudio } from '../api/ai.api';
 import { apiFetch } from '../api/apiClient';
-import { useAudioPlayer } from 'expo-audio';
+import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
 export const useAiChat = () => {
 
@@ -52,8 +52,19 @@ export const useAiChat = () => {
                 if (audioURI){
 
                     audioPlayer.replace({uri: audioURI});
-                    audioPlayer.play();
+                    try {
+                        
+                        await setAudioModeAsync({
+                            playsInSilentMode: true,
+                            allowsRecording: false,
+                            interruptionMode: 'mixWithOthers'
+                        })
 
+                        audioPlayer.play();
+                    } catch (error: any){
+                        console.error("Eroare la redarea raspunsului:", error);
+                        throw error;
+                    }
                 }
 
             } 

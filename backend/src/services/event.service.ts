@@ -54,8 +54,10 @@ export const searchEventsByFilters = async (filters: EventFilter) => {
     if (filters.artist)
         whereClause.artist = { contains: filters.artist, mode: 'insensitive' }
 
-    if (filters.eventName)
-        whereClause.title = { contains: filters.eventName, mode: 'insensitive' }
+    if (filters.eventName){
+        const cleanSearchText = filters.eventName.replace(/[^a-zA-z0-9]/g, '');
+        whereClause.normalizedText = { contains: cleanSearchText, mode: 'insensitive' }
+    }
 
     if (filters.date_from || filters.date_to){
         whereClause.date = {};

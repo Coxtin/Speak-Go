@@ -67,20 +67,21 @@ model Venue {
 }
 
 model Event {
-  id          Int          @id @default(autoincrement())
-  title       String       @map("event_name") @db.VarChar(150)
-  description String       @db.Text
-  category    String       @db.VarChar(50)
-  artist      String?      @db.VarChar(255)
+  id              Int          @id @default(autoincrement())
+  title           String       @map("event_name") @db.VarChar(150)
+  normalizedTitle String?      @map("normalized_title") @db.VarChar(150)
+  description     String       @db.Text
+  category        String       @db.VarChar(50)
+  artist          String?      @db.VarChar(255)
 
-  genres      String[]     @default([]) @map("genres")
+  genres          String[]     @default([]) @map("genres")
 
-  date        DateTime     @map("event_date") @db.Timestamp(6)
-  imageUrl    String?      @map("image_url")
-  status      String?      @default("ACTIVE") @db.VarChar(20)
+  date            DateTime     @map("event_date") @db.Timestamp(6)
+  imageUrl        String?      @map("image_url")
+  status          String?      @default("ACTIVE") @db.VarChar(20)
   
-  venueId     Int          @map("venue_id")
-  venue       Venue        @relation(fields: [venueId], references: [id], onDelete: Restrict)
+  venueId         Int          @map("venue_id")
+  venue           Venue        @relation(fields: [venueId], references: [id], onDelete: Restrict)
   
   createdAt   DateTime?    @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime?    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)

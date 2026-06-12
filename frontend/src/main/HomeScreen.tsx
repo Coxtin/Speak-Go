@@ -195,11 +195,14 @@ const HomeScreen = () => {
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 onPress={() => {
-                                    if (openModal){
+                                    if (openModal && modal?.closeModal){
                                         openModal(<SearchEvents 
                                             inModal={true}
-                                            closeModal={modal.visible}
-                                        />)
+                                            initialText={text}
+                                            onSearchReady={fetchFilteredEvents}
+                                            closeModal={modal.closeModal}
+                                        />);
+                                        setText("");
                                     }
                                 }}
                                 className='bg-blue p-3 rounded-full ml-2 shadow-md flex-row items-center justify-center'
@@ -220,7 +223,7 @@ const HomeScreen = () => {
                                         openModal(<SearchEvents 
                                             inModal={true}
                                             onSearchReady={fetchFilteredEvents}
-                                            closeModal={modal.visible}
+                                            closeModal={modal.closeModal}
                                         />);
                                     }
                                  }}
