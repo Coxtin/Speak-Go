@@ -19,8 +19,11 @@ import InsertResetCodeScreen from './src/screens/auth/InsertResetCodeScreen';
 import ModifyPasswordScreen from './src/screens/auth/ModifyPasswordScreen';
 import TestingAIReponse from './src/screens/test/TestingAIResponse'
 import SearchEvents from './src/screens/main/SearchEvents';
+import EventPage from './src/screens/eventPages/EventPage';
 import MainTabNavigator from './src/navigation/MainNavigator';
 import GlobalModal from './src/components/GlobalModal';
+import BookEvent from './src/screens/eventPages/BookEvent';
+import PaymentSummary from './src/screens/eventPages/PaymentSummary';
 
 
 const Stack = createNativeStackNavigator();
@@ -52,6 +55,25 @@ const RootNavigator = () => {
                         options={{ headerShown: false }} 
                     />
                     
+                    <Stack.Screen 
+                        name="EventPage"
+                        component={EventPage}
+                        options={{ headerShown: false }}
+                    
+                    />
+
+                    <Stack.Screen
+                        name="BookEvent"
+                        component={BookEvent}
+                        options={{headerShown: false}}
+                    />
+
+                    <Stack.Screen
+                        name="PaymentSummary"
+                        component={PaymentSummary}
+                        options={{headerShown: false}}
+                    />
+
                     {/* <Stack.Screen 
                         name="TestingVoice" 
                         component={VoiceCommands} 

@@ -1,5 +1,6 @@
-import { Response, Request } from "express";
+import { Response, Request, response } from "express";
 import * as eventService from '../services/event.service';
+import { getEventTicketDetails } from "../services/ticket.service";
 
 export const fetchEvents = async(req: Request, res: Response) => {
 
@@ -59,6 +60,36 @@ export const searchEvent = async (req: Request, res: Response) => {
         console.error("Eroare la cautarea evenimentelor: ", error);
         return res.status(401).json({message: "Nu am putut filtra evenimentele! Va rugam, incercati mai tarziu!"});
 
+    }
+
+}
+
+export const fetchTicketsForEvents = async (req: Request, res: Response) => {
+
+    try {
+
+        const eventId = parseInt(req.params.id, 10);
+
+        if (isNaN(eventId)){
+            return res.status(400).json({message: "ID-ul evenimentului trebuie sa fie un numar valid!"});
+        }
+
+        const response = await getEventTicketDetails(eventId);
+
+        if (response.value === false){
+            return res.status(500).json({message: response.message})
+        }
+
+        return res.status(200).json({ticketInfo: response.ticketInfo});
+
+    } catch (error: any) {
+        
+        console.error("Eroare la returnarea biletelor: ", error);
+
+        if (error.message === "A aparut o problema la identificarea evenimentului!")
+            return res.status(401).json({message: error.message});
+        else
+            return res.status(500).json({message: "Eroare interna a server-ului"});
     }
 
 }

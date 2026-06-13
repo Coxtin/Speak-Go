@@ -1,5 +1,6 @@
 // screens/Main/HomeScreen.tsx
 import React, { useState, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext'; 
@@ -15,6 +16,7 @@ const HomeScreen = () => {
     
     const auth = useContext(AuthContext);
     const modal = useContext(ModalContext);
+    const navigation = useNavigation<any>();
 
     const openModal = modal?.openModal;
     
@@ -24,7 +26,9 @@ const HomeScreen = () => {
 
     if (isLoading && events.length === 0){
         return (
-            <SafeAreaView>
+            <SafeAreaView
+                className='flex-1 justify-center items-center'
+            >
                 <ActivityIndicator size="large" color="#2563EB"/>
                 <Text className="text-gray-500 mt-4 font-medium">Se încarcă evenimentele...</Text>
             </SafeAreaView>
@@ -42,6 +46,14 @@ const HomeScreen = () => {
         );
     }
 
+    const goToEventPage = (eventData: EventParams) => {
+
+        navigation.navigate("EventPage", {
+            eventData: eventData
+        });
+    }
+
+
     const renderEventCard = ({ item }: { item: EventParams }) => {
         // Combinăm BASE_URL cu ruta relativă salvată în baza de date (/uploads/nume_poza.jpg)
         const fullImageUrl = item.imageUrl ? `${BASE_URL}${item.imageUrl}` : null;
@@ -58,6 +70,7 @@ const HomeScreen = () => {
             <TouchableOpacity 
                 activeOpacity={0.9}
                 className="bg-white rounded-3xl shadow-sm mb-6 overflow-hidden border border-gray-100"
+                onPress={() => goToEventPage(item)}
             >
                 {/* Secțiunea Imaginii */}
                 {fullImageUrl ? (
