@@ -6,6 +6,7 @@ export type PaymentParams = {
             price: number;
             currency: string;
             quantity: number;
+            eventName?: string;
         }[];
         totalPrice: number;
         currency: string;

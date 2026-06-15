@@ -2,6 +2,7 @@ import { prisma } from "../config/db";
 import Stripe from "stripe";
 import crypto from 'crypto';
 import { CreatePaymentRequest } from "../types/payment.types";
+import { sendBookingEmail } from "./ticket.service";
 
 export const createPaymentIntent = async(userId: number, eventId: number, selectedTickets: {ticketId: number, quantity: number}[]) => {
 
@@ -154,6 +155,9 @@ export const confirmPaymentAndGenerateTickets = async (userId: number, bookingId
                 }
             })
         ]);
+
+        // Trimitem email-ul de confirmare (asincron, nu așteptăm după el pentru a nu bloca răspunsul)
+        sendBookingEmail(booking.id).catch(err => console.error("Eroare la trimiterea email-ului de confirmare:", err));
 
         return { value: true, message: "Plata confirmata si biletele au fost activate!" };
 

@@ -143,6 +143,9 @@ const PaymentSummary = () => {
                     {selectedTickets.map((item, index) => (
                         <View key={item.id} className={`flex-row justify-between items-center ${index !== 0 ? 'mt-4 pt-4 border-t border-gray-200' : ''}`}>
                             <View className="flex-1">
+                                {item.eventName && (
+                                    <Text className="text-gray-400 text-xs font-bold uppercase mb-1">{item.eventName}</Text>
+                                )}
                                 <Text className="text-gray-900 font-bold text-lg">{item.name}</Text>
                                 <Text className="text-gray-500">
                                     {item.quantity} x {item.price} {item.currency}

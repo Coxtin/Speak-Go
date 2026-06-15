@@ -14,7 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../api/apiClient'; // Ajustează calea dacă este nevoie
 import { Ticket } from '../../types/TicketInfo';
 
-
 const TicketPage = () => {
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -68,12 +67,23 @@ const TicketPage = () => {
         <View className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6 mx-1 items-center">
             <View className="w-full items-center mb-6 pb-6 border-b border-dashed border-gray-200">
                 <Text className="text-xl font-black text-gray-900 text-center mb-2">
-                    {item.booking.event.name}
+                    {item.booking.event.name || item.booking.event.title}
                 </Text>
-                <View className="bg-blue-50 px-4 py-1.5 rounded-full">
-                    <Text className="text-blue-700 font-bold text-sm">
-                        {item.ticketType.name}
-                    </Text>
+                
+                <View className="flex-row items-center space-x-2">
+                    <View className="bg-blue-50 px-4 py-1.5 rounded-full">
+                        <Text className="text-blue-700 font-bold text-sm">
+                            {item.ticketType.name}
+                        </Text>
+                    </View>
+                    
+                    {item.booking.totalTickets && (
+                        <View className="bg-gray-100 px-3 py-1.5 rounded-full">
+                            <Text className="text-gray-600 font-bold text-sm">
+                                {item.booking.totalTickets} {item.booking.totalTickets === 1 ? 'bilet' : 'bilete'}
+                            </Text>
+                        </View>
+                    )}
                 </View>
             </View>
 

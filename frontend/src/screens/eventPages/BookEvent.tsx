@@ -50,7 +50,8 @@ const BookEvent = () => {
             .filter(type => ticketQuantities[type.id] > 0)
             .map(type => ({
                 ...type,
-                quantity: ticketQuantities[type.id]
+                quantity: ticketQuantities[type.id],
+                eventName: ticket.eventName // Adăugăm numele evenimentului
             }));
 
         const totalPrice = selectedTickets.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);

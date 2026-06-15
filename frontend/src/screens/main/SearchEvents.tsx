@@ -17,7 +17,6 @@ type SearchEventsProps = {
 
 const SearchEvents = ({ inModal = false, onSearchReady, initialText, closeModal }: SearchEventsProps) => {
 
-
     const { startRecording, stopRecording, isRecording, isProcessingSTT } = useSpeechToText(); 
     const { aiMessage, isAiThinking, processUserMessage, resetChat } = useAiChat();
     
@@ -67,6 +66,8 @@ const SearchEvents = ({ inModal = false, onSearchReady, initialText, closeModal 
         if (AIResult && AIResult.action === 'search_event'){
             if (onSearchReady)
                 onSearchReady(AIResult.parameters);
+
+            closeModal();
         }
 
         setReplyText("");
@@ -82,6 +83,8 @@ const SearchEvents = ({ inModal = false, onSearchReady, initialText, closeModal 
                 if (AIResult && AIResult.action === 'search_event'){
                     if (onSearchReady)
                         onSearchReady(AIResult.parameters);
+
+                    closeModal();
                 }
             }
     };

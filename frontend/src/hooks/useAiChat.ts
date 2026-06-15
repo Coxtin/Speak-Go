@@ -33,7 +33,7 @@ export const useAiChat = () => {
                     ...currentHistory,
                     { role: 'assistant', content: JSON.stringify(AIResponse) }
                 ]);
-            } else if (AIResponse.action === "search_events" || AIResponse.action === "greeting") {
+            } else if (AIResponse.action === "search_event" || AIResponse.action === "greeting") {
                 // Dacă a găsit datele sau doar a salutat, curățăm istoricul pentru o cerere nouă
                 setChatHistory([]);
             }
