@@ -130,6 +130,8 @@ model Booking {
   status          String?   @default("PENDING") @db.VarChar(20) // PENDING, PAID, CANCELLED
   paymentIntentId String?   @map("payment_intent_id") @db.VarChar(100)
 
+  expiresAt       DateTime? @map("expires_at") @db.Timestamp(6) 
+
   createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt       DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
 

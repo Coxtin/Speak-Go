@@ -3,6 +3,7 @@ import { View, ActivityIndicator } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import "./global.css"; 
 
 //Contexte
@@ -23,176 +24,183 @@ import EventPage from './src/screens/eventPages/EventPage';
 import MainTabNavigator from './src/navigation/MainNavigator';
 import GlobalModal from './src/components/GlobalModal';
 import BookEvent from './src/screens/eventPages/BookEvent';
+import TicketPage from './src/screens/ticketPage/TicketPage';
 import PaymentSummary from './src/screens/eventPages/PaymentSummary';
 
 
 const Stack = createNativeStackNavigator();
 
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51ThrXyL2TYUo7CJ5fU110hCU7rmGQEeRWyoYQMWVHu19btHeL8N2CO3XDvGA2MZZ4w1yCJud1yT55PNhpSKgmivw00ASQZcqCj";
+
 const RootNavigator = () => {
 
-  const auth = React.useContext(AuthContext);
+    const auth = React.useContext(AuthContext);
 
-  if (auth?.isLoading){
+    if (auth?.isLoading){
+        return (
+
+        <View
+            className='flex-1 justify-center items-center'
+        >
+            <ActivityIndicator size="large" color="blue"/>
+        </View>
+
+        )
+    }
+
+
     return (
+            <Stack.Navigator>
+                {auth?.user ? (
+                    // 🟢 ECRANE PROTEJATE (Doar pentru utilizatori logați)
+                    <>
+                        <Stack.Screen 
+                            name="MainTabs" 
+                            component={MainTabNavigator} 
+                            options={{ headerShown: false }} 
+                        />
+                        
+                        <Stack.Screen 
+                            name="EventPage"
+                            component={EventPage}
+                            options={{ headerShown: false }}
+                        
+                        />
 
-      <View
-        className='flex-1 justify-center items-center'
-      >
-        <ActivityIndicator size="large" color="blue"/>
-      </View>
+                        <Stack.Screen
+                            name="BookEvent"
+                            component={BookEvent}
+                            options={{headerShown: false}}
+                        />
 
-    )
-  }
+                        <Stack.Screen
+                            name="PaymentSummary"
+                            component={PaymentSummary}
+                            options={{headerShown: false}}
+                        />
 
-  return (
-        <Stack.Navigator>
-            {auth?.user ? (
-                // 🟢 ECRANE PROTEJATE (Doar pentru utilizatori logați)
-                <>
-                    <Stack.Screen 
-                        name="MainTabs" 
-                        component={MainTabNavigator} 
-                        options={{ headerShown: false }} 
-                    />
-                    
-                    <Stack.Screen 
-                        name="EventPage"
-                        component={EventPage}
-                        options={{ headerShown: false }}
-                    
-                    />
 
-                    <Stack.Screen
-                        name="BookEvent"
-                        component={BookEvent}
-                        options={{headerShown: false}}
-                    />
+                        {/* <Stack.Screen 
+                            name="TestingVoice" 
+                            component={VoiceCommands} 
+                            options={{ 
+                                title: 'Testare Voce 🎤',
+                                headerStyle: { backgroundColor: '#f4511e' },
+                                headerTintColor: "#fff",
+                                headerTitleStyle: { fontWeight: 'bold' },
+                                headerShown: true 
+                            }} 
+                        />
+                        <Stack.Screen
+                            name="TestingAIResponse"
+                            component={TestingAIReponse}
+                            options={{
+                                title: "Testare Raspunsuri AI",
+                                headerStyle: { backgroundColor: '#f45qqe' },
+                                headerTintColor: '#fff',
+                                headerTitleStyle: { fontWeight: 'bold' },
+                                headerShown: true
+                            }}
+                        />
+                        <Stack.Screen
+                            name="SearchEvents"
+                            component={SearchEvents}
+                            options={{
+                                title: "Testare Comanda -> Raspuns AI",
+                                headerStyle: { backgroundColor: '#f45qqe' },
+                                headerTintColor: '#fff',
+                                headerTitleStyle: { fontWeight: 'bold' },
+                                headerShown: true
+                            }}
+                        /> */}
+                    </>
+                ) : (
+                    // 🔴 ECRANE PUBLICE (Doar pentru vizitatori)
+                    <>
+                        <Stack.Screen
+                            name="LoginPage"
+                            component={LoginScreen}
+                            options={{ 
+                                title: 'Pagina Logare',
+                                headerStyle: { backgroundColor: 'blue' },
+                                headerTintColor: "#fff",
+                                headerShown: true 
+                            }}
+                        />
+                        <Stack.Screen 
+                            name="SignupPage"
+                            component={SignUpScreen}
+                            options={{ 
+                                title: 'Pagina înregistrare',
+                                headerStyle: { backgroundColor: 'green' },
+                                headerTintColor: "#fff",
+                                headerShown: true 
+                            }}
+                        />
 
-                    <Stack.Screen
-                        name="PaymentSummary"
-                        component={PaymentSummary}
-                        options={{headerShown: false}}
-                    />
+                        <Stack.Screen
+                            name="ResetPasswordScreen"
+                            component={ResetPasswordScreen}
+                            options={{
+                                title: 'Reseteaza parola',
+                                headerStyle: {backgroundColor: 'green'},
+                                headerTintColor: "#fff",
+                                headerShown: true,
+                            }}
+                        />
+                        <Stack.Screen
+                            name="InsertResetCodeScreen"
+                            component={InsertResetCodeScreen}
+                            options={{
+                                title: 'Introdu codul',
+                                headerStyle: {backgroundColor: 'green'},
+                                headerTintColor: "#fff",
+                                headerShown: true,
+                            }}
+                        />
+                        <Stack.Screen
+                            name="ModifyPasswordScreen"
+                            component={ModifyPasswordScreen}
+                            options={{
+                                title: 'Modifica parola',
+                                headerStyle: {backgroundColor: 'green'},
+                                headerTintColor: "#fff",
+                                headerShown: true,
+                            }}
+                        />
 
-                    {/* <Stack.Screen 
-                        name="TestingVoice" 
-                        component={VoiceCommands} 
-                        options={{ 
-                            title: 'Testare Voce 🎤',
-                            headerStyle: { backgroundColor: '#f4511e' },
-                            headerTintColor: "#fff",
-                            headerTitleStyle: { fontWeight: 'bold' },
-                            headerShown: true 
-                        }} 
-                    />
-                    <Stack.Screen
-                        name="TestingAIResponse"
-                        component={TestingAIReponse}
-                        options={{
-                            title: "Testare Raspunsuri AI",
-                            headerStyle: { backgroundColor: '#f45qqe' },
-                            headerTintColor: '#fff',
-                            headerTitleStyle: { fontWeight: 'bold' },
-                            headerShown: true
-                        }}
-                    />
-                    <Stack.Screen
-                        name="SearchEvents"
-                        component={SearchEvents}
-                        options={{
-                            title: "Testare Comanda -> Raspuns AI",
-                            headerStyle: { backgroundColor: '#f45qqe' },
-                            headerTintColor: '#fff',
-                            headerTitleStyle: { fontWeight: 'bold' },
-                            headerShown: true
-                        }}
-                    /> */}
-                </>
-            ) : (
-                // 🔴 ECRANE PUBLICE (Doar pentru vizitatori)
-                <>
-                    <Stack.Screen
-                        name="LoginPage"
-                        component={LoginScreen}
-                        options={{ 
-                            title: 'Pagina Logare',
-                            headerStyle: { backgroundColor: 'blue' },
-                            headerTintColor: "#fff",
-                            headerShown: true 
-                        }}
-                    />
-                    <Stack.Screen 
-                        name="SignupPage"
-                        component={SignUpScreen}
-                        options={{ 
-                            title: 'Pagina înregistrare',
-                            headerStyle: { backgroundColor: 'green' },
-                            headerTintColor: "#fff",
-                            headerShown: true 
-                        }}
-                    />
+                    </>
+                )}
+            </Stack.Navigator>
+        );
 
-                    <Stack.Screen
-                        name="ResetPasswordScreen"
-                        component={ResetPasswordScreen}
-                        options={{
-                            title: 'Reseteaza parola',
-                            headerStyle: {backgroundColor: 'green'},
-                            headerTintColor: "#fff",
-                            headerShown: true,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="InsertResetCodeScreen"
-                        component={InsertResetCodeScreen}
-                        options={{
-                            title: 'Introdu codul',
-                            headerStyle: {backgroundColor: 'green'},
-                            headerTintColor: "#fff",
-                            headerShown: true,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="ModifyPasswordScreen"
-                        component={ModifyPasswordScreen}
-                        options={{
-                            title: 'Modifica parola',
-                            headerStyle: {backgroundColor: 'green'},
-                            headerTintColor: "#fff",
-                            headerShown: true,
-                        }}
-                    />
+    }
 
-                </>
-            )}
-        </Stack.Navigator>
+    export default function App() {
+    // React.useEffect(() => {
+    //   const pingBackendRoot = async () => {
+    //     try {
+    //       await fetch("http://172.20.10.6:5002/");
+    //     } catch (error) {
+    //       console.log("Could not call backend root route:", error);
+    //     }
+    //   };
+
+    //   pingBackendRoot();
+    // }, []);
+
+    return (
+        <SafeAreaProvider>
+            <AuthProvider>
+                <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+                    <NavigationContainer>
+                        <ModalProvider>
+                            <GlobalModal />
+                            <RootNavigator />
+                        </ModalProvider>
+                    </NavigationContainer>
+                </StripeProvider>
+            </AuthProvider>
+        </SafeAreaProvider>
     );
-
-}
-
-export default function App() {
-  // React.useEffect(() => {
-  //   const pingBackendRoot = async () => {
-  //     try {
-  //       await fetch("http://172.20.10.6:5002/");
-  //     } catch (error) {
-  //       console.log("Could not call backend root route:", error);
-  //     }
-  //   };
-
-  //   pingBackendRoot();
-  // }, []);
-
-  return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <NavigationContainer>
-            <ModalProvider>
-               <GlobalModal />
-               <RootNavigator />
-            </ModalProvider>
-        </NavigationContainer>
-      </AuthProvider>
-    </SafeAreaProvider>
-  );
 }

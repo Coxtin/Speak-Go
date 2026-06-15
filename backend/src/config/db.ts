@@ -28,13 +28,26 @@
 
 // export default pool;
 
+import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
-//import { PrismaClient } from "../../generated/prisma/client";
 import { PrismaClient } from "../../generated/prisma";
 
 const connectionString = `${process.env.DATABASE_URL}`;
 
-const adapter = new PrismaPg({connectionString});
-const prisma = new PrismaClient({adapter});
+console.log("[DB]: Se inițializează conexiunea la baza de date...");
+if (!process.env.DATABASE_URL) {
+    console.error("[DB]: EROARE: DATABASE_URL nu este definit în .env!");
+}
+
+const pool = new Pool({ connectionString });
+
+pool.on('error', (err) => {
+    console.error("[DB]: Eroare neașteptată la pool-ul de PostgreSQL:", err);
+});
+
+const adapter = new PrismaPg(pool as any);
+const prisma = new PrismaClient({ adapter });
+
+console.log("[DB]: Prisma Client a fost instanțiat.");
 
 export { prisma };

@@ -13,3 +13,20 @@ export type EventTicketResponse = {
         ticketTypes: TicketInfo[]
     }
 }
+
+export type Ticket = {
+
+    id: number;
+    qrCode: string;
+    status: string;
+    ticketType: {
+        name: string;
+        price: string | number; // Decimal din Prisma poate veni ca string în JSON
+    };
+    booking: {
+        event: {
+            name: string;
+        };
+    };
+
+}

@@ -1,16 +1,131 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { PaymentParams } from '../../types/PaymentParams';
+import { usePaymentSheet, useStripe } from '@stripe/stripe-react-native';
+import { apiFetch } from '../../api/apiClient';
+import { AuthContext } from '../../context/AuthContext';
 
 type PaymentRouteProp = RouteProp<PaymentParams, 'PaymentSummary'>;
 
 const PaymentSummary = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const route = useRoute<PaymentRouteProp>();
-    const { selectedTickets, totalPrice, currency } = route.params;
+    const { selectedTickets, totalPrice, currency, eventId } = route.params;
+
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleCheckOut = async () => {
+
+        try {
+
+            setIsProcessing(true);
+
+            const payload = { 
+                eventId: eventId,
+                selectedTickets: selectedTickets.map((ticket) => ({
+                    ticketId: ticket.id,
+                    quantity: ticket.quantity
+                }))
+            };
+
+            const response = await apiFetch('/payments/create-intent', {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+
+            const data = await response.json();
+
+            if (!response.ok){
+                
+                if (Platform.OS === 'web')
+                    window.alert(`Eroare, ${data.message}` || "Eroare la prelucrarea comenzii!");
+                else
+                    Alert.alert("Eroare!",
+                                `Eroare: ${data.message}` || "Eroare la prelucrarea comenzii!");
+                    
+                    setIsProcessing(false);
+                    return;
+
+            }
+
+            const { error: initError } = await initPaymentSheet({
+                merchantDisplayName: "Speak&Go",
+                paymentIntentClientSecret: data.client_secret,
+                returnURL: 'speakandgo://stripe-redirect',
+            })
+
+            if (initError){
+                if (Platform.OS === 'web')
+                    window.alert(`Eroare Stripe: ${initError.message}`);
+                else
+                    Alert.alert("Eroare!",
+                                `Eroare Stripe: ${initError.message}`);
+
+                setIsProcessing(false);
+                return;
+        
+            }
+
+            const { error: paymentError } = await presentPaymentSheet();
+
+            if (paymentError){
+
+                if (paymentError.code === "Canceled")
+                    console.log("Plata anulata de utilizator!");
+                else
+                    Alert.alert("Eroare", `Eroare: ${paymentError.code} ; ${paymentError.message}`);
+
+            } else {
+
+                try {
+
+                    const confirmResponse = await apiFetch('/payments/confirm', {
+                        method: "POST",
+                        body: JSON.stringify({ bookingId: data.bookingId })
+                    })
+
+                    const confirmData = await confirmResponse.json();
+
+                    if (!confirmResponse.ok){
+                        Alert.alert("Avertisment",
+                                    "Plata a reusit, dar a aparut o intarziere la generarea biletelor! Te rugam, verifica sectiunea 'Biletele mele'");
+                        navigation.navigate("MainTabs", { screen: "Biletele mele" });
+                        return;
+                    }
+
+                    Alert.alert("Succes!", "Plata a fost realizata cu succes! Biletele tale au fost activate!");
+                    navigation.navigate("MainTabs", { screen: "Biletele mele" });
+
+                } catch (error: any){
+
+                    console.error(error);
+                    Alert.alert("Eroare", "Nu am putut verifica statusul biletelor! Verifica sectiunea 'Biletele mele'!");
+                    navigation.navigate("MainTabs", { screen: "Biletele mele" });
+
+                }
+            }
+
+
+        } catch (error: any){
+
+            console.log(error);
+
+              if (Platform.OS === 'web')
+                    window.alert("Eroare de conexiune! Te rugam sa verifici conexiunea la internet!");
+                else
+                    Alert.alert("Eroare!",
+                                "Eroare de conexiune! Te rugam sa verifici conexiunea la internet!");
+        
+            } finally {
+                setIsProcessing(false);
+            }
+
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-white">
@@ -60,10 +175,7 @@ const PaymentSummary = () => {
             <View className="p-6 border-t border-gray-100 bg-white">
                 <TouchableOpacity 
                     className="bg-blue-600 py-4 rounded-2xl items-center shadow-lg shadow-blue-300"
-                    onPress={() => {
-                        // Aici va veni logica de procesare a plății
-                        alert('Procesare plată în curs...');
-                    }}
+                    onPress={handleCheckOut}
                 >
                     <Text className="text-white font-bold text-lg">Confirmă și Plătește</Text>
                 </TouchableOpacity>

@@ -4,30 +4,28 @@ import { getEventTicketDetails } from "../services/ticket.service";
 
 export const fetchEvents = async(req: Request, res: Response) => {
 
+    console.log("[DEBUG]: Cerere primită pentru fetchEvents");
+
     try {
 
         const response = await eventService.fetchDataBaseForEvents();
 
         if (response.value === true && response.events){
-            const firstEvent = response.events[0];
-            // console.log(
-            //     "[fetchEvents] Primul eveniment chei:",
-            //     firstEvent ? Object.keys(firstEvent) : "N/A"
-            // );
-            //console.log("[fetchEvents] Primul eveniment ticketTypes:", firstEvent?.ticketTypes);
-
+            console.log(`[DEBUG]: S-au găsit ${response.events.length} evenimente`);
             return res.status(200).json({events: response.events})
 
         }
 
+        console.log("[DEBUG]: Nu s-au găsit evenimente în DB");
         return res.status(404).json({message: "Nu exista evenimente disponibile"});
 
     } catch (error: any){
-        console.error("Eroare la incarcarea evenimentelor: ", error);
-        return res.status(401).json({message: "Nu s-au putut incarca evenimentele! Va rugam, incercati mai tarziu!"});
+        console.error("[DEBUG]: Eroare la incarcarea evenimentelor: ", error);
+        return res.status(500).json({message: "Nu s-au putut incarca evenimentele! Va rugam, incercati mai tarziu!"});
     }
 
 }
+
 
 export const searchEvent = async (req: Request, res: Response) => {
 

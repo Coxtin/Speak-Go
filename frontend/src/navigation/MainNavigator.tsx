@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 // Importăm ecranele tale
 import HomeScreen from '../main/HomeScreen'; 
+import TicketPage from '../screens/ticketPage/TicketPage';
 import SearchEvents from '../screens/main/SearchEvents'; 
 // import ProfileScreen from '../screens/Main/ProfileScreen'; // O poți crea ulterior
 
@@ -48,8 +49,8 @@ const MainTabNavigator = () => {
 
                     if (route.name === 'Acasă') {
                         iconName = focused ? 'home' : 'home-outline';
-                    } else if (route.name === 'Caută') {
-                        iconName = focused ? 'mic' : 'mic-outline';
+                    } else if (route.name === 'Biletele mele') {
+                        iconName = focused ? 'ticket' : 'ticket-outline';
                     } else if (route.name === 'Profil') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
@@ -66,7 +67,7 @@ const MainTabNavigator = () => {
             })}
         >
             <Tab.Screen name="Acasă" component={HomeScreen} />
-            {/* <Tab.Screen name="Caută" component={SearchEvents} /> */}
+            <Tab.Screen name="Biletele mele" component={TicketPage} />
             <Tab.Screen name="Profil" component={DummyProfile} />
         </Tab.Navigator>
     );

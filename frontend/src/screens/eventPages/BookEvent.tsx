@@ -59,7 +59,8 @@ const BookEvent = () => {
         navigation.navigate('PaymentSummary', {
             selectedTickets,
             totalPrice,
-            currency
+            currency,
+            eventId
         } );
     };
 

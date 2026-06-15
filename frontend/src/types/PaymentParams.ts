@@ -9,5 +9,6 @@ export type PaymentParams = {
         }[];
         totalPrice: number;
         currency: string;
+        eventId: number
     };
 };

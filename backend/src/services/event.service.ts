@@ -11,7 +11,7 @@ export type EventResponse = Prisma.EventGetPayload<{
 export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? : EventResponse[]}> => {
 
     try {
-
+        console.log("[SERVICE]: Se execută prisma.event.findMany...");
         const events = await prisma.event.findMany({
             include: {
                 venue: true,
@@ -27,11 +27,12 @@ export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? 
             }
         });
 
+        console.log(`[SERVICE]: findMany a returnat ${events.length} evenimente.`);
         return {value: true, events: events as EventResponse[]};
 
     } catch (error: any){
 
-        console.error("Eroare la interogarea bazei de date: ", error);
+        console.error("[SERVICE]: Eroare la interogarea bazei de date: ", error);
         return {value: false};
 
     }
@@ -56,7 +57,7 @@ export const searchEventsByFilters = async (filters: EventFilter) => {
 
     if (filters.eventName){
         const cleanSearchText = filters.eventName.replace(/[^a-zA-z0-9]/g, '');
-        whereClause.normalizedText = { contains: cleanSearchText, mode: 'insensitive' }
+        whereClause.normalizedTitle = { contains: cleanSearchText, mode: 'insensitive' }
     }
 
     if (filters.date_from || filters.date_to){

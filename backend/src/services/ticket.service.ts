@@ -42,3 +42,37 @@ export const getEventTicketDetails = async (eventId: number) => {
     }
 
 }
+
+export const getUserTickets = async (userId: number) => {
+    
+    try {
+
+        const tickets = await prisma.ticket.findMany({
+            where: {
+                booking: {
+                    userId: userId,
+                    status: "PAID"
+                }
+            },
+            include: {
+                ticketType: true,
+                booking: {
+                    include: {
+                        event: true,
+                    }
+                },
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        })
+
+        return { tickets: tickets };
+
+    } catch (error: any){
+        
+        console.error("A aparut o eroare la verificarea numarului de bilete: ", error);
+        throw new Error("eroare la conexiune la baza de date!");
+        
+    }
+}
