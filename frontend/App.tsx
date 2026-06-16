@@ -26,6 +26,9 @@ import GlobalModal from './src/components/GlobalModal';
 import BookEvent from './src/screens/eventPages/BookEvent';
 import TicketPage from './src/screens/ticketPage/TicketPage';
 import PaymentSummary from './src/screens/eventPages/PaymentSummary';
+import HelpCenter from './src/screens/userUtils/HelpCenter';
+import ChangePassword from './src/screens/userUtils/ChangePassword';
+import ScannerPage from './src/screens/scan/ScannerPage';
 
 
 const Stack = createNativeStackNavigator();
@@ -79,6 +82,23 @@ const RootNavigator = () => {
                             options={{headerShown: false}}
                         />
 
+                        <Stack.Screen
+                            name="HelpCenter"
+                            component={HelpCenter}
+                            options={{headerShown: false}}
+                        />
+
+                        <Stack.Screen
+                            name="ChangePassword"
+                            component={ChangePassword}
+                            options={{headerShown: false}}
+                        />
+
+                        <Stack.Screen
+                            name="ScannerPage"
+                            component={ScannerPage}
+                            options={{ headerShown: false }}
+                        />
 
                         {/* <Stack.Screen 
                             name="TestingVoice" 

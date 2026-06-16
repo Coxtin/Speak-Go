@@ -1,7 +1,7 @@
 // screens/Main/HomeScreen.tsx
 import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Image, SectionList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext'; 
 import { useEvents } from '../hooks/useEvents';
@@ -22,6 +22,22 @@ const HomeScreen = () => {
     
     const { events, isLoading, error, fetchFilteredEvents , refresh } = useEvents();
     const [text, setText] = useState<string>("");
+
+    // Grupăm evenimentele pe categorii
+    const groupedEvents = events.reduce((acc: Record<string, EventParams[]>, event) => {
+        const category = event.category || 'Altele';
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+        acc[category].push(event);
+        return acc;
+    }, {});
+
+    const sections = Object.keys(groupedEvents).map(category => ({
+        title: category,
+        data: groupedEvents[category]
+    }));
+
     //console.log("Date primite de la Backend: ", JSON.stringify(events, null, 2));
 
     if (isLoading && events.length === 0){
@@ -158,13 +174,22 @@ const HomeScreen = () => {
                         </View>
                     </View>
 
-                    {/* Listarea eficientă cu FlatList */}
-                    <FlatList
-                        data={events}
+                    {/* Listarea eficientă cu SectionList grupate pe categorii */}
+                    <SectionList
+                        sections={sections}
                         renderItem={renderEventCard}
+                        renderSectionHeader={({ section: { title } }) => (
+                            <View className="bg-slate-50 pt-6 pb-2">
+                                <Text className="text-xl font-black text-slate-800 uppercase tracking-tight">
+                                    {title}
+                                </Text>
+                                <View className="h-1 w-12 bg-blue-600 rounded-full mt-1" />
+                            </View>
+                        )}
                         keyExtractor={(item) => item.id.toString()}
-                        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 100 }}
+                        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 10, paddingBottom: 120 }}
                         showsVerticalScrollIndicator={false}
+                        stickySectionHeadersEnabled={false}
                         keyboardDismissMode='on-drag'
                         
                         // Pull to Refresh: Când utilizatorul trage în jos de listă, se re-execută funcția refresh

@@ -91,6 +91,35 @@ export const getUserTickets = async (userId: number) => {
     }
 }
 
+export const deleteTicket = async (ticketId: number, userId: number) => {
+    try {
+        // Verificăm dacă biletul aparține utilizatorului
+        const ticket = await prisma.ticket.findFirst({
+            where: {
+                id: ticketId,
+                booking: {
+                    userId: userId
+                }
+            }
+        });
+
+        if (!ticket) {
+            return { success: false, message: "Biletul nu a fost găsit sau nu vă aparține!" };
+        }
+
+        await prisma.ticket.delete({
+            where: {
+                id: ticketId
+            }
+        });
+
+        return { success: true, message: "Biletul a fost șters cu succes!" };
+    } catch (error) {
+        console.error("Eroare la ștergerea biletului:", error);
+        return { success: false, message: "Eroare la ștergerea biletului din baza de date!" };
+    }
+}
+
 export const sendBookingEmail = async (bookingId: number) => {
     try {
         const booking = await prisma.booking.findUnique({
@@ -126,7 +155,7 @@ export const sendBookingEmail = async (bookingId: number) => {
                 <p style="margin: 5px 0; color: #6B7280; font-family: monospace;">ID: ${ticket.qrCode.split('-')[0]}</p>
                 <div style="margin: 15px 0;">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticket.qrCode}" 
-                         alt="QR Code" 
+                         alt="QR Code - ${ticket.qrCode}" 
                          style="border: 1px solid #E5E7EB; padding: 10px; border-radius: 8px;">
                 </div>
                 <p style="margin: 0; font-size: 14px; color: #9CA3AF;">Prezentați acest cod la intrare</p>

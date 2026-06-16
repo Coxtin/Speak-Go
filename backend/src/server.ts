@@ -18,6 +18,7 @@ import aiRoutes from './routes/aiRoutes';
 import eventRoutes from './routes/eventRoutes';
 import paymentRoutes from './routes/paymentRoutes'
 import ticketRoutes from './routes/ticketRoutes'
+import userRoutes from './routes/userRoutes';
 
 const port = 5002;
 
@@ -53,6 +54,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/user', userRoutes);
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: "ok", message: "Server is running" });

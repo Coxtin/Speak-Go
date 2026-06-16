@@ -1,65 +1,41 @@
 // navigation/MainTabNavigator.tsx
-import React, { useContext } from 'react';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
-import { AuthContext } from '../context/AuthContext';
-// Importăm ecranele tale
+import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 import HomeScreen from '../main/HomeScreen'; 
 import TicketPage from '../screens/ticketPage/TicketPage';
-import SearchEvents from '../screens/main/SearchEvents'; 
-// import ProfileScreen from '../screens/Main/ProfileScreen'; // O poți crea ulterior
+import UserPage from '../screens/user/UserPage';
 
 const Tab = createBottomTabNavigator();
 
-// Un ecran temporar de Profil până îl construiești pe cel real
-const DummyProfile = () => {
-
-    const auth = useContext(AuthContext);
-
-    return (
-
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Ecranul de Profil (În curând)</Text>
-            <View>
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={auth?.logout}
-                >
-                    <Text className='color-red-500 font-bold px-4 py-4 bg-slate-900 border rounded-xl'>LogOut</Text> 
-                    <Ionicons
-                        name="log-out-outline"
-                        color="red"
-                        size={22}
-                    />   
-                </TouchableOpacity>
-            </View>
-        </View>
-
-    )
-};
-
 const MainTabNavigator = () => {
+
+    const navigation = useNavigation<any>();
 
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
-                    let iconName: any;
+                    let iconName: React.ComponentProps<typeof Ionicons>['name'];
 
                     if (route.name === 'Acasă') {
                         iconName = focused ? 'home' : 'home-outline';
                     } else if (route.name === 'Biletele mele') {
                         iconName = focused ? 'ticket' : 'ticket-outline';
-                    } else if (route.name === 'Profil') {
+                    } else if (route.name === 'Contul meu') {
                         iconName = focused ? 'person' : 'person-outline';
+                    } else {
+                        iconName = 'help-circle-outline';
                     }
 
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: '#2563EB', // Culoarea albastră când e selectat
+                tabBarActiveTintColor: '#2563EB',
                 tabBarInactiveTintColor: 'gray',
-                headerShown: false, // Ascundem header-ul default de sus (îl vom face custom pe fiecare ecran dacă e nevoie)
+                headerShown: false,
                 tabBarStyle: {
                     paddingBottom: 5,
                     height: 60,
@@ -68,7 +44,28 @@ const MainTabNavigator = () => {
         >
             <Tab.Screen name="Acasă" component={HomeScreen} />
             <Tab.Screen name="Biletele mele" component={TicketPage} />
-            <Tab.Screen name="Profil" component={DummyProfile} />
+            <Tab.Screen 
+                name="Contul meu"
+                component={UserPage}
+                options={{ 
+                    tabBarButton: (props) => {
+                        const { children, ref, ...rest } = props as any;
+                        return (
+                            <Pressable
+                                {...rest}
+                                delayLongPress={2000}
+                                onLongPress={() => {
+                                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                                    console.log("Pagina de scanare este deschisa!");
+                                    navigation.navigate("ScannerPage");
+                                }}
+                            >
+                                {children}
+                            </Pressable>
+                        );
+                    }
+                }}
+                />
         </Tab.Navigator>
     );
 };

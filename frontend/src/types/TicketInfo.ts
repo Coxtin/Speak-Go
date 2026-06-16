@@ -29,6 +29,7 @@ export type Ticket = {
         event: {
             name: string;
             title?: string;
+            date: string;
         };
         // Numărul total de bilete din această rezervare
         totalTickets?: number;

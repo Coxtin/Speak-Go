@@ -17,7 +17,7 @@ export const processUserCommand = async (conversationHistory: Array<ChatCompleti
         messages: [
             {
                 role: 'system',
-                content: getEventSearchPrompt()
+                content: await getEventSearchPrompt()
             },
             ...conversationHistory
         ],

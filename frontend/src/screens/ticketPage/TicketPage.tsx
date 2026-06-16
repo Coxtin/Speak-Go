@@ -5,7 +5,9 @@ import {
     FlatList, 
     ActivityIndicator, 
     RefreshControl, 
-    Platform
+    Platform,
+    TouchableOpacity,
+    Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -62,53 +64,99 @@ const TicketPage = () => {
         fetchMyTickets();
     };
 
+    const handleDeleteTicket = async (ticketId: number) => {
+        Alert.alert(
+            "Ștergere Bilet",
+            "Ești sigur că vrei să ștergi acest bilet din istoricul tău?",
+            [
+                { text: "Anulează", style: "cancel" },
+                { 
+                    text: "Șterge", 
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const response = await apiFetch(`/tickets/${ticketId}`, {
+                                method: 'DELETE'
+                            });
+
+                            if (response.ok) {
+                                // Actualizăm lista local sau refacem fetch-ul
+                                setTickets(prev => prev.filter(t => t.id !== ticketId));
+                            } else {
+                                const data = await response.json();
+                                Alert.alert("Eroare", data.message || "Nu s-a putut șterge biletul.");
+                            }
+                        } catch (err) {
+                            Alert.alert("Eroare", "A apărut o problemă la ștergerea biletului.");
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     // Design-ul pentru un singur bilet
-    const renderTicket = ({ item }: { item: Ticket }) => (
-        <View className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6 mx-1 items-center">
-            <View className="w-full items-center mb-6 pb-6 border-b border-dashed border-gray-200">
-                <Text className="text-xl font-black text-gray-900 text-center mb-2">
-                    {item.booking.event.name || item.booking.event.title}
-                </Text>
-                
-                <View className="flex-row items-center space-x-2">
-                    <View className="bg-blue-50 px-4 py-1.5 rounded-full">
-                        <Text className="text-blue-700 font-bold text-sm">
-                            {item.ticketType.name}
-                        </Text>
-                    </View>
+    const renderTicket = ({ item }: { item: Ticket }) => {
+        const isPastEvent = new Date(item.booking.event.date) < new Date();
+
+        return (
+            <View className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6 mx-1 items-center">
+                <View className="w-full items-center mb-6 pb-6 border-b border-dashed border-gray-200">
+                    <Text className="text-xl font-black text-gray-900 text-center mb-2">
+                        {item.booking.event.name || item.booking.event.title}
+                    </Text>
                     
-                    {item.booking.totalTickets && (
-                        <View className="bg-gray-100 px-3 py-1.5 rounded-full">
-                            <Text className="text-gray-600 font-bold text-sm">
-                                {item.booking.totalTickets} {item.booking.totalTickets === 1 ? 'bilet' : 'bilete'}
+                    <View className="flex-row items-center space-x-2">
+                        <View className="bg-blue-50 px-4 py-1.5 rounded-full">
+                            <Text className="text-blue-700 font-bold text-sm">
+                                {item.ticketType.name}
                             </Text>
                         </View>
+                        
+                        {item.booking.totalTickets && (
+                            <View className="bg-gray-100 px-3 py-1.5 rounded-full">
+                                <Text className="text-gray-600 font-bold text-sm">
+                                    {item.booking.totalTickets} {item.booking.totalTickets === 1 ? 'bilet' : 'bilete'}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
+
+                {/* Generarea on-the-fly a codului QR vectorial */}
+                <View className="p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
+                    <QRCode
+                        value={item.qrCode} 
+                        size={200}
+                        color="#111827" // Un negru mai blând pentru design, dar perfect scanabil
+                        backgroundColor="white"
+                    />
+                </View>
+
+                <View className="w-full flex-row justify-between items-center mt-6">
+                    <Text className="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                        ID BILET: {item.qrCode.split('-')[0]}
+                    </Text>
+                    
+                    {isPastEvent && (
+                        <TouchableOpacity 
+                            onPress={() => handleDeleteTicket(item.id)}
+                            className="bg-red-50 p-2 rounded-full"
+                        >
+                            <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                        </TouchableOpacity>
                     )}
                 </View>
+                
+                {/* Un mic badge vizual pentru status */}
+                {item.status === 'SCANNED' && (
+                    <View className="absolute top-4 right-4 bg-red-100 px-3 py-1 rounded-full">
+                        <Text className="text-red-700 font-bold text-xs uppercase">Scanat</Text>
+                    </View>
+                )}
             </View>
-
-            {/* Generarea on-the-fly a codului QR vectorial */}
-            <View className="p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
-                <QRCode
-                    value={item.qrCode} 
-                    size={200}
-                    color="#111827" // Un negru mai blând pentru design, dar perfect scanabil
-                    backgroundColor="white"
-                />
-            </View>
-
-            <Text className="mt-6 text-xs font-mono text-gray-400 uppercase tracking-widest">
-                ID BILET: {item.qrCode.split('-')[0]}
-            </Text>
-            
-            {/* Un mic badge vizual pentru status */}
-            {item.status === 'SCANNED' && (
-                <View className="absolute top-4 right-4 bg-red-100 px-3 py-1 rounded-full">
-                    <Text className="text-red-700 font-bold text-xs uppercase">Scanat</Text>
-                </View>
-            )}
-        </View>
-    );
+        );
+    };
 
     // Starea de încărcare inițială
     if (isLoading && !isRefreshing) {

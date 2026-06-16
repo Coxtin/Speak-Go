@@ -1,5 +1,27 @@
-export const getEventSearchPrompt = () => {
+import { prisma } from "../config/db";
+
+export const getEventSearchPrompt = async () => {
     const currentDate = new Date().toISOString().split('T')[0];
+    
+    let uniqueGenres: string[] = [];
+
+    try {
+
+        const events = await prisma.event.findMany({
+            select: {
+                genres: true
+            }
+        })
+
+        const allGenresFlat = events.flatMap(events => events.genres);
+        uniqueGenres = [...new Set(allGenresFlat)];
+
+    } catch (error: any){
+        console.error("Eroare la gasirea evenimentelor: ", error);
+        uniqueGenres = ["teatru | concert | opera | stand-up | festival | sau orice alt eveniment specificat de catre utilizator | all"]
+    }
+
+    const availableGenresString = uniqueGenres.join(", ");
 
     return `
     Ești "Speak&Go", un asistent AI de extragere a datelor și direcționare (intent routing) pentru o aplicație de rezervări bilete la evenimente.
@@ -9,6 +31,9 @@ export const getEventSearchPrompt = () => {
     INFORMAȚII DE CONTEXT VITALE:
     - Data curentă este: ${currentDate}. 
     Folosește această dată ca punct de referință absolut pentru a calcula zilele relative (ex: dacă utilizatorul spune "mâine", "weekend-ul acesta", "săptămâna viitoare", calculează și returnează date calendaristice exacte în format YYYY-MM-DD).
+
+    - GENURI DISPONIBILE ÎN SISTEM: ${availableGenresString}.
+    Folosește această listă pentru a asocia cerințele utilizatorului cu genurile pe care le avem. Dacă genul cerut de utilizator (sau un sinonim apropiat) se regăsește în această listă, extrage-l exact așa cum este scris aici.
 
     REGULA DE RAFINARE A CĂUTĂRII (SLOT FILLING):
     1. CĂUTARE DIRECTĂ: Dacă utilizatorul oferă un NUME DE EVENIMENT (ex: "Untold") sau un ARTIST (ex: "Eminem"), ai suficiente date! Treci direct la căutare. NU mai cere alte informații.
@@ -39,7 +64,7 @@ export const getEventSearchPrompt = () => {
         "intent": "search_events",
         "reply_message": "[Aici generezi tu, ca asistent, un mesaj de confirmare, cum că ai găsit evenimente care corespund cerințelor utilizatorului]",
         "parameters": {
-            "category": "teatru | concert | opera | stand-up | festival | all",
+            "category": "teatru | concert | opera | stand-up | festival | "sau orice alt eveniment specificat de catre utilizator" | all",
             "genre": "Genul muzical (ex: Rock, Pop, Electronic, etc) sau tipul spectacolului (ex: Comedie, Dramă) extras sau null"
             "city": "Numele orașului extras sau null",
             "artist": "Numele artistului extras sau null",

@@ -19,7 +19,16 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children } : {children: ReactNode}) => {
 
     const [user, setUser] = useState<UserData | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    const logout = async () => {
+
+        await secureStore.deleteItemAsync('accessToken');
+        await secureStore.deleteItemAsync('refreshToken');
+        await secureStore.deleteItemAsync('userData');
+        setUser(null);
+
+    }
 
     useEffect(() => {
 
@@ -60,14 +69,6 @@ export const AuthProvider = ({ children } : {children: ReactNode}) => {
 
     }
 
-    const logout = async () => {
-
-        await secureStore.deleteItemAsync('accessToken');
-        await secureStore.deleteItemAsync('refreshToken');
-        await secureStore.deleteItemAsync('userData');
-        setUser(null);
-
-    }
 
     return (
         <AuthContext.Provider value={{user, isLoading, login, logout}}>

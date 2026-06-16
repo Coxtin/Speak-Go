@@ -41,6 +41,12 @@
       "@react-native-community/datetimepicker",
       "expo-secure-store",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Permite accesul la cameră pentru scanarea biletelor."
+        }
+      ],
+      [
         "@stripe/stripe-react-native",
         {
           "merchantIdentifier": "",

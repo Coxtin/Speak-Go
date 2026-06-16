@@ -5,7 +5,7 @@ import { CreatePaymentRequest } from "../types/payment.types";
 import { sendBookingEmail } from "./ticket.service";
 
 export const createPaymentIntent = async(userId: number, eventId: number, selectedTickets: {ticketId: number, quantity: number}[]) => {
-
+    console.log(userId)
     try {
 
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
@@ -55,12 +55,18 @@ export const createPaymentIntent = async(userId: number, eventId: number, select
                     data: { availableCapacity: { decrement: ticket.quantity } }
                 });
             }
+            console.log("=== DEBUG PRISMA ÎN TRANZACȚIE ===");
+            console.log("Valoare brută userId:", userId);
+            console.log("Tip userId:", typeof userId);
+            console.log("Este userId null sau undefined?", userId == null);
+            console.log("Este Number(userId) valid?", !isNaN(Number(userId)));
+            console.log("================================");
 
             // Creăm rezervarea (booking)
             const booking = await tx.booking.create({
                 data: {
-                    userId: userId,
-                    eventId: eventId,
+                    userId: Number(userId),
+                    eventId: Number(eventId),
                     status: "PENDING",
                     expiresAt: expirationTime,
                     totalPrice: realAmount / 100
