@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Text, View, Button, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ export default function ScannerScreen() {
     const navigation = useNavigation();
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
+    const isScanningRef = useRef(false);
 
     if (!permission) {
         return <View className="flex-1 bg-black" />;
@@ -24,25 +25,44 @@ export default function ScannerScreen() {
         );
     }
 
+    const resetScanner = () => {
+        isScanningRef.current = false;
+        setScanned(false);
+    };
+
     const handleBarcodeScanned = async ({ data }: { data: string }) => {
-        if (scanned) return;
+        if (isScanningRef.current) return;
+        isScanningRef.current = true;
         setScanned(true);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
         try {
-            await apiFetch('/');
+            const response = await apiFetch('/tickets/scan', {
+                method: 'POST',
+                body: JSON.stringify({ qrCode: data })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok){
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Alert.alert("ACCES RESPINS", result.message || "Eroare la scanarea biletului.", [
+                    { text: "Scanează din nou", onPress: resetScanner }
+                ]);
+                return;
+            }
+
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             Alert.alert(
                 "ACCES PERMIS",
-                "Biletul este valid și a fost marcat ca scanat.",
-                [{ text: "Următorul bilet", onPress: () => setScanned(false) }]
+                result.message || "Biletul este valid și a fost marcat ca scanat.",
+                [{ text: "Următorul bilet", onPress: resetScanner }]
             );
         } catch (error: any) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            const errorMessage = error.response?.data?.message || "Bilet invalid sau eroare de rețea.";
             Alert.alert(
-                "ACCES RESPINS",
-                errorMessage,
-                [{ text: "Scanează din nou", onPress: () => setScanned(false), style: 'cancel' }]
+                "EROARE REȚEA",
+                "Nu s-a putut contacta serverul. Verifică conexiunea la internet.",
+                [{ text: "Încearcă din nou", onPress: resetScanner }]
             );
         }
     };

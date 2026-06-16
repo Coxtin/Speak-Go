@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserTickets, deleteTicket } from "../services/ticket.service";
+import { getUserTickets, deleteTicket, checkTicketQrCode } from "../services/ticket.service";
 
 export const fetchTickets = async (req: Request, res: Response) => {
     try {
@@ -43,3 +43,27 @@ export const removeTicket = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Eroare internă a serverului!" });
     }
 };
+
+export const scanTicket = async (req: Request, res: Response) => {
+
+    try {
+
+        const { qrCode } = req.body;
+
+        if (!qrCode) {
+            return res.status(400).json({ message: "Codul QR lipseste!" });
+        }
+
+        const response = await checkTicketQrCode(qrCode);
+
+        if (response.value === true)
+            return res.status(200).json({ message: response.message });
+
+        return res.status(400).json({ message: response.message || "Eroare la scanarea biletului!" });
+
+    } catch (error: any){
+        console.error("Eroare la scanarea biletului: ", error);
+        return res.status(500).json({ message: "Eroare interna la scanarea biletului!" });
+    }
+
+}

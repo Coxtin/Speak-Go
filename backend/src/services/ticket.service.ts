@@ -214,3 +214,43 @@ export const sendBookingEmail = async (bookingId: number) => {
         console.error("Eroare la trimiterea email-ului de confirmare:", error);
     }
 }
+
+export const checkTicketQrCode = async (ticketQrCode: string) => {
+
+    try {
+
+        const realTicket = await prisma.ticket.findUnique({
+            where: {
+                qrCode: ticketQrCode
+            },
+        });
+
+        if (!realTicket){
+            console.error("Acest bilet nu exista!");
+            return { value: false, message: "Acest bilet nu exista in baza de date!" }
+        }
+
+        if (realTicket.status === "ACTIVE"){
+            await prisma.ticket.update({
+                where: {
+                    qrCode: ticketQrCode
+                },
+                data: {
+                    status: "SCANNED"
+                }
+            });
+
+            return { value: true, message: "Biletul a fost scanat cu succes! Bine ai venit si distractie placuta!" };
+
+        } else if (realTicket.status === "SCANNED")
+            return { value: false, message: "Biletul a fost deja scanat!" };
+        else
+            return { value: false, message: "Biletul nu a fost recunoscut!" };
+
+
+    } catch (error: any){
+        console.error("Eroare la verificarea codului qr al biletului: ", error);
+        return { value: false };
+    }
+
+}

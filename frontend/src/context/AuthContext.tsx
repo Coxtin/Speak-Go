@@ -1,5 +1,7 @@
 import React, {createContext, useState, useEffect, ReactNode} from "react";
+import { Alert } from "react-native";
 import * as secureStore from 'expo-secure-store';
+import { apiFetch } from "../api/apiClient";
 
 type UserData = {
     id: string,
@@ -42,13 +44,20 @@ export const AuthProvider = ({ children } : {children: ReactNode}) => {
 
                 if (storedAccessToken && storedRefreshToken && storedUser){
 
-                    setUser(JSON.parse(storedUser));
+                    const response = await apiFetch('/auth/validate-session');
+
+                    if (response.ok) {
+                        setUser(JSON.parse(storedUser));
+                    } else {
+                        await logout();
+                        Alert.alert("Sesiune expirată", "Te rugăm să te loghezi din nou pentru a continua.");
+                    }
 
                 }
 
             } catch (error: any){
 
-                console.error("Error at checking stored token!");
+                console.error("Error at checking stored token!", error);
 
             } finally {
                 setIsLoading(false);
