@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 import { Ionicons } from '@expo/vector-icons';
-import { apiFetch } from '../../api/apiClient'; // Ajustează calea dacă este nevoie
+import { apiFetch } from '../../api/apiClient'; 
 import { Ticket } from '../../types/TicketInfo';
 
 const TicketPage = () => {
@@ -148,7 +148,6 @@ const TicketPage = () => {
                     )}
                 </View>
                 
-                {/* Un mic badge vizual pentru status */}
                 {item.status === 'SCANNED' && (
                     <View className="absolute top-4 right-4 bg-red-100 px-3 py-1 rounded-full">
                         <Text className="text-red-700 font-bold text-xs uppercase">Scanat</Text>

@@ -185,7 +185,7 @@ const BookEvent = () => {
                     <Text className="text-white font-bold text-lg">
                         {totalSelectedTickets <= 0 ? "Alege un bilet!" : 
                         totalSelectedTickets > availableSeats ? "Nu sunt destule bilete!"
-                        : `Cumpara (${totalSelectedTickets} ${totalSelectedTickets == 1 ? "bilet" : "bilete"})`}
+                        : `Cumpără (${totalSelectedTickets} ${totalSelectedTickets == 1 ? "bilet" : "bilete"})`}
                     </Text>
                 </TouchableOpacity>
             </View>

@@ -85,7 +85,7 @@ const LoginPage = () => {
                                         <Text className="mb-2 text-sm text-slate-600">Email</Text>
                                         <TextInput
                                             className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.email ? "border-red-400" : "border-slate-300"}`}
-                                            placeholder="ceva@ceva.com"
+                                            placeholder="Introduceți adresa de email"
                                             placeholderTextColor="#94a3b8"
                                             onChangeText={onChange}
                                             onBlur={onBlur}
@@ -108,7 +108,7 @@ const LoginPage = () => {
                                         <Text className="mb-2 text-sm text-slate-600">Parolă</Text>
                                         <TextInput
                                             className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.password ? "border-red-400" : "border-slate-300"}`}
-                                            placeholder="Introdu parola"
+                                            placeholder="Introduceți parola"
                                             placeholderTextColor="#94a3b8"
                                             onChangeText={onChange}
                                             onBlur={onBlur}

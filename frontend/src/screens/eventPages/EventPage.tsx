@@ -160,7 +160,7 @@ const EventPage = () => {
                         <Text
                             className='text-white font-bold'
                         >
-                            Fara Imagine
+                            Fără Imagine
                         </Text>
                     </View>
 

@@ -27,7 +27,7 @@ const ChangePassword = () => {
     const onSubmit = async (data: ChangePasswordValues) => {
         
         if (data.oldPassword === data.newPassword){
-            Alert.alert("Atentie!", "Nu poti schimba parola cu aceasi ca cea veche!");
+            Alert.alert("Atenție!", "Nu poți schimba parola cu aceeași ca cea veche!");
             return;
         }
         

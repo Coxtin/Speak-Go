@@ -162,7 +162,7 @@ const RootNavigator = () => {
                             name="ResetPasswordScreen"
                             component={ResetPasswordScreen}
                             options={{
-                                title: 'Reseteaza parola',
+                                title: 'Resetează parola',
                                 headerStyle: {backgroundColor: 'green'},
                                 headerTintColor: "#fff",
                                 headerShown: true,
@@ -182,7 +182,7 @@ const RootNavigator = () => {
                             name="ModifyPasswordScreen"
                             component={ModifyPasswordScreen}
                             options={{
-                                title: 'Modifica parola',
+                                title: 'Modifică parola',
                                 headerStyle: {backgroundColor: 'green'},
                                 headerTintColor: "#fff",
                                 headerShown: true,
