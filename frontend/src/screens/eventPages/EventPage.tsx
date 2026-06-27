@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Text, TouchableOpacity, View, Image, ActivityIndicator, Alert, Platform, Dimensions } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { ModalContext } from '../../context/ModalContext';
 import { EventParams } from '../../types/eventParams';
 import { BASE_URL } from '../../../config/config';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +13,7 @@ import Animated, {
     useAnimatedScrollHandler,
     interpolate
 } from 'react-native-reanimated';
+import ReviewPage from './ReviewPage';
 
 const MAX_IMAGE_HEIGHT = 500;
 const MIN_IMAGE_HEIGHT = 250;
@@ -25,7 +27,14 @@ const EventPage = () => {
 
     const navigation = useNavigation<any>();
     const route = useRoute<EventDetailsProp>();
+    const modal = useContext(ModalContext);
     const { eventData } = route.params;
+
+    const hasScannedTicket = eventData?.bookings && eventData.bookings.length > 0;
+    const hasNotReviewed = !eventData?.reviews || eventData.reviews.length === 0;
+    const canLeaveReview = hasScannedTicket && hasNotReviewed;
+    
+    const openModal = modal?.openModal;
 
     const goToBookEvent = (eventId: number) => {
         navigation.navigate("BookEvent", {
@@ -287,21 +296,41 @@ const EventPage = () => {
                     elevation: 10,
                 }}
             >
-                <View>
-                    <Text className='text-gray-500 text-xs font-medium uppercase'>Preț pornire</Text>
-                    <Text className='text-2xl font-black text-blue-600'>
-                        {eventData.ticketTypes && eventData.ticketTypes.length > 0 
-                            ? `${eventData.ticketTypes[0].price} ${eventData.ticketTypes[0].currency}` 
-                            : 'Gratuit'}
-                    </Text>
-                </View>
+                {canLeaveReview ? (
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => {
+                            if (openModal && !modal?.visible){
+                                openModal(<ReviewPage
+                                    eventId={eventData.id}
+                                    closeModal={modal?.closeModal}
+                                />)
+                            }
+                        }}
+                        className='bg-yellow-500 w-full py-4 rounded-2xl shadow-lg shadow-yellow-300 items-center'
+                    >  
+                        <Text className='text-yellow-900 font-black text-lg uppercase tracking-wider'>Scrie un review</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <>
+                        <View>
+                            <Text className='text-gray-500 text-xs font-medium uppercase'>Preț pornire</Text>
+                            <Text className='text-2xl font-black text-blue-600'>
+                            {eventData.ticketTypes && eventData.ticketTypes.length > 0 
+                                ? `${eventData.ticketTypes[0].price} ${eventData.ticketTypes[0].currency}` 
+                                : 'Gratuit'}
+                            </Text>
+                        </View>
                 
-                <TouchableOpacity 
-                    className='bg-blue-600 px-10 py-4 rounded-2xl shadow-lg shadow-blue-300'
-                    onPress={() => goToBookEvent(eventData.id)}
-                >
-                    <Text className='text-white font-bold text-lg'>Rezervă</Text>
-                </TouchableOpacity>
+                        <TouchableOpacity 
+                            className='bg-blue-600 px-10 py-4 rounded-2xl shadow-lg shadow-blue-300'
+                            onPress={() => goToBookEvent(eventData.id)}
+                        >
+                            <Text className='text-white font-bold text-lg'>Rezervă</Text>
+                        </TouchableOpacity>
+                    </>
+                )}
+                
             </View>
 
        </View>

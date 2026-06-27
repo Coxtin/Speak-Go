@@ -10,11 +10,14 @@ import '../../../global.css';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { registerUser } from "../../api/auth.api";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 
 const SignupPage = () => {
 
-    const [showDatePicker, setShowDatePicker] = useState(false)
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showAgainPassword, setShowAgainPassword] = useState(false);
     const navigation = useNavigation<any>();
 
     const {
@@ -145,7 +148,7 @@ const SignupPage = () => {
 
                                 <TextInput
                                     className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.username ? "border-red-400" : "border-slate-300"}`}
-                                    placeholder="username"
+                                    placeholder="Username"
                                     placeholderTextColor="#94a3b8"
                                     onChangeText={onChange}
                                     onBlur={onBlur}
@@ -175,7 +178,7 @@ const SignupPage = () => {
                                     </Text>
                                     <TextInput
                                     className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.email ? "border-red-400" : "border-slate-300"}`}
-                                    placeholder="ceva@ceva.com"
+                                    placeholder="JohnDoe@gmail.com"
                                     placeholderTextColor="#94a3b8"
                                     onChangeText={onChange}
                                     onBlur={onBlur}
@@ -279,61 +282,61 @@ const SignupPage = () => {
                     </View>
                  
                     <View className="mb-4">
-                        <Controller
-                            control={control}
-                            name="password"
-                            render={({
-                                field: {onChange, onBlur, value}
-                            }) => (
-                                <>
-                                <Text className="text-sm font-sans">
-                                    Parolă
-                                </Text>
-                                
-                                <TextInput
-                                     className={`mt-2 rounded-xl border px-4 py-3 text-slate-900 ${errors.password ? "border-red-400" : "border-slate-300"}`}
-                                     placeholder="Introdu parola"
-                                     placeholderTextColor="#94a3b8"
-                                     onChangeText={onChange}
-                                     onBlur={onBlur}
-                                     value={value}
-                                     secureTextEntry
-                                />
-                                </>
-                            )}
-                        />
-                         
+                        <Text className="mb-2 text-sm text-slate-600">Parolă</Text>
+                        <View className={`flex-row items-center rounded-xl border ${errors.password ? "border-red-400" : "border-slate-300"}`}>
+                            <Controller
+                                control={control}
+                                name="password"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextInput
+                                        className="flex-1 px-4 py-3 text-slate-900"
+                                        placeholder="Introdu parola"
+                                        placeholderTextColor="#94a3b8"
+                                        onChangeText={onChange}
+                                        onBlur={onBlur}
+                                        value={value}
+                                        secureTextEntry={!showPassword}
+                                    />
+                                )}
+                            />
+                            <TouchableOpacity
+                                className="px-4"
+                                activeOpacity={0.8}
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#9CA3AF"/>
+                            </TouchableOpacity>
+                        </View>
                         {errors.password && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.password.message}</Text>)}
-
                     </View>
                     
                     <View className="mb-4">
-                        <Controller
-                            control={control}
-                            name="repeatPassword"
-                            render={({
-                                field: {onChange, onBlur, value}
-                            }) => (
-                                <>
-                                <Text className="mb-2 text-sm text-slate-600">
-                                    Repetă parola
-                                </Text>
-                                
-                                <TextInput
-                                     className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.repeatPassword ? "border-red-400" : "border-slate-300"}`}
-                                     placeholder="Reintrodu parola"
-                                     placeholderTextColor="#94a3b8"
-                                     onChangeText={onChange}
-                                     onBlur={onBlur}
-                                     value={value}
-                                     secureTextEntry
-                                />
-                                </>
-                            )}
-                        />
-                         
+                        <Text className="mb-2 text-sm text-slate-600">Repetă parola</Text>
+                        <View className={`flex-row items-center rounded-xl border ${errors.repeatPassword ? "border-red-400" : "border-slate-300"}`}>
+                            <Controller
+                                control={control}
+                                name="repeatPassword"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextInput
+                                        className="flex-1 px-4 py-3 text-slate-900"
+                                        placeholder="Reintrodu parola"
+                                        placeholderTextColor="#94a3b8"
+                                        onChangeText={onChange}
+                                        onBlur={onBlur}
+                                        value={value}
+                                        secureTextEntry={!showAgainPassword}
+                                    />
+                                )}
+                            />
+                            <TouchableOpacity
+                                className="px-4"
+                                activeOpacity={0.8}
+                                onPress={() => setShowAgainPassword(!showAgainPassword)}
+                            >
+                                <Ionicons name={showAgainPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#9CA3AF"/>
+                            </TouchableOpacity>
+                        </View>
                         {errors.repeatPassword && (<Text className="ml-1 mt-1 text-sm text-red-500">{errors.repeatPassword.message}</Text>)}
-
                     </View>
 
                 <TouchableOpacity

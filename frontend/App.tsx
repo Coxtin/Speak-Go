@@ -29,6 +29,7 @@ import PaymentSummary from './src/screens/eventPages/PaymentSummary';
 import HelpCenter from './src/screens/userUtils/HelpCenter';
 import ChangePassword from './src/screens/userUtils/ChangePassword';
 import ScannerPage from './src/screens/scan/ScannerPage';
+import ReviewPage from './src/screens/eventPages/ReviewPage';
 
 
 const Stack = createNativeStackNavigator();
@@ -93,6 +94,8 @@ const RootNavigator = () => {
                             component={ChangePassword}
                             options={{headerShown: false}}
                         />
+
+                        {/* Am sters ReviewPage de aici deoarece este folosit ca o componenta de Modal, nu ca un ecran de sine statator */}
 
                         <Stack.Screen
                             name="ScannerPage"

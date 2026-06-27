@@ -18,5 +18,12 @@ export type EventParams = {
        price: number,
        currency: string
     }[];
+    bookings?: {
+        id: number
+    }[],
+    reviews?: {
+        id: number
+    }[]
+
 
 };

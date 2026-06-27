@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, TouchableOpacity, Platform, Alert, TextInput, KeyboardAvoidingView, ScrollView } from "react-native";
 import { useForm, Controller } from "react-hook-form";
@@ -8,11 +8,14 @@ import { LoginFormValues, loginSchema } from "../../schemas/auth.schema";
 import { loginUser } from "../../api/auth.api";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../../context/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const LoginPage = () => {
 
     const navigation = useNavigation<any>();
-
+    
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    
     const auth = useContext(AuthContext);
 
     const {
@@ -100,24 +103,35 @@ const LoginPage = () => {
                         </View>
 
                         <View className="mb-5">
-                            <Controller
-                                control={control}
-                                name="password"
-                                render={({ field: { onChange, onBlur, value } }) => (
-                                    <>
-                                        <Text className="mb-2 text-sm text-slate-600">Parolă</Text>
+                            <Text className="mb-2 text-sm text-slate-600">Parolă</Text>
+                            <View className={`flex-row items-center rounded-xl border ${errors.password ? "border-red-400" : "border-slate-300"}`}>
+                                <Controller
+                                    control={control}
+                                    name="password"
+                                    render={({ field: { onChange, onBlur, value } }) => (
                                         <TextInput
-                                            className={`rounded-xl border px-4 py-3 text-slate-900 ${errors.password ? "border-red-400" : "border-slate-300"}`}
+                                            className="flex-1 px-4 py-3 text-slate-900"
                                             placeholder="Introduceți parola"
                                             placeholderTextColor="#94a3b8"
                                             onChangeText={onChange}
                                             onBlur={onBlur}
                                             value={value}
-                                            secureTextEntry
+                                            secureTextEntry={!showOldPassword}
                                         />
-                                    </>
-                                )}
-                            />
+                                    )}
+                                />
+                                <TouchableOpacity
+                                    className="px-4"
+                                    activeOpacity={0.8}
+                                    onPress={() => setShowOldPassword(!showOldPassword)}
+                                >
+                                    <Ionicons
+                                        name={showOldPassword ? "eye-off-outline" : "eye-outline"}
+                                        size={20}
+                                        color="#9CA3AF"
+                                    />
+                                </TouchableOpacity>
+                            </View>
                             {errors.password && <Text className="ml-1 mt-1 text-sm text-red-500">{errors.password.message}</Text>}
                         </View>
 

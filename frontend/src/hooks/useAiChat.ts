@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 import { ChatCompletionMessageParam } from '../types/chatCompletionMessageParam'; 
 import { transferCommand, getAudio } from '../api/ai.api';
-import { apiFetch } from '../api/apiClient';
 import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
 export const useAiChat = () => {
@@ -43,7 +42,7 @@ export const useAiChat = () => {
                 ? AIResponse?.message
                 : JSON.stringify(AIResponse ?? "", null, 2);
 
-            setAiMessage(`${displayText} \n\n ${AIResponse.action}`);
+            setAiMessage(`${displayText}`);
 
             if (AIResponse.message && AIResponse.action != "search_event"){
 

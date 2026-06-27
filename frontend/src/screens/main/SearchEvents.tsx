@@ -187,7 +187,7 @@ const SearchEvents = ({ inModal = false, onSearchReady, initialText, closeModal 
                             className='flex-row items-center px-4 py-2 bg-gray-50 rounded-full border-gray-200'
                         >
                             <Ionicons
-                                name={inputMode === 'keyboard' ? 'text-outline' : 'mic-outline'}
+                                name={inputMode === 'keyboard' ? 'mic-outline' : 'text-outline'}
                                 size={18}
                                 color="#4B5563"
                             />

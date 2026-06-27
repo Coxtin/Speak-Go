@@ -1,7 +1,16 @@
 // screens/Main/HomeScreen.tsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, TextInput, Image, SectionList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import Animated, { 
+    useSharedValue, 
+    useAnimatedStyle, 
+    withRepeat, 
+    withTiming, 
+    withSequence,
+    interpolateColor,
+    Easing 
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext'; 
 import { useEvents } from '../hooks/useEvents';
@@ -65,10 +74,9 @@ const HomeScreen = () => {
     const goToEventPage = (eventData: EventParams) => {
 
         navigation.navigate("EventPage", {
-            eventData: eventData
+            eventData: eventData,
         });
     }
-
 
     const renderEventCard = ({ item }: { item: EventParams }) => {
         // Combinăm BASE_URL cu ruta relativă salvată în baza de date (/uploads/nume_poza.jpg)
@@ -82,73 +90,131 @@ const HomeScreen = () => {
         const minPrice = prices.length > 0 ? Math.min(...prices) : null;
         const currency = item.ticketTypes?.map((t => t.currency))
 
+        const hasScannedTicket = item.bookings && item.bookings.length > 0;
+        const hasNotReviewed = !item.reviews || item.reviews.length === 0;
+        const canLeaveReview = hasScannedTicket && hasNotReviewed;
+
+        const pulse = useSharedValue(0);
+
+        useEffect(() => {
+            if (canLeaveReview) {
+                pulse.value = withRepeat(
+                    withSequence(
+                        withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
+                        withTiming(0, { duration: 1200, easing: Easing.inOut(Easing.ease) })
+                    ),
+                    -1, // Infinit
+                    true // Reversibil
+                );
+            } else {
+                pulse.value = 0;
+            }
+        }, [canLeaveReview]);
+
+        const animatedBorderStyle = useAnimatedStyle(() => {
+            const animatedBorderColor = interpolateColor(
+                pulse.value,
+                [0, 1],
+                ['rgba(245, 158, 11, 0.1)', 'rgba(245, 158, 11, 1)']
+            );
+
+            const scale = 1 + (pulse.value * 0.015);
+
+            return {
+                borderColor: canLeaveReview ? animatedBorderColor : '#f3f4f6',
+                borderWidth: canLeaveReview ? 3 : 1,
+                transform: [{ scale: canLeaveReview ? scale : 1 }],
+                shadowColor: canLeaveReview ? '#f59e0b' : '#000',
+                shadowOpacity: canLeaveReview ? 0.1 + (pulse.value * 0.4) : 0.05,
+                shadowRadius: canLeaveReview ? 4 + (pulse.value * 6) : 3,
+                elevation: canLeaveReview ? 2 + (pulse.value * 6) : 2,
+            };
+        });
+
         return (
             <TouchableOpacity 
                 activeOpacity={0.9}
-                className="bg-white rounded-3xl shadow-sm mb-6 overflow-hidden border border-gray-100"
                 onPress={() => goToEventPage(item)}
+                className="mb-6"
             >
-                {/* Secțiunea Imaginii */}
-                {fullImageUrl ? (
-                    <Image 
-                        source={{ uri: fullImageUrl }} 
-                        className="w-full h-48 bg-gray-100"
-                        resizeMode="cover"
-                    />
-                ) : (
-                    <View className="w-full h-48 bg-gray-200 items-center justify-center">
-                        <Text className="text-gray-400 font-medium">Fără Imagine</Text>
+                <Animated.View 
+                    className="bg-white rounded-3xl overflow-hidden"
+                    style={animatedBorderStyle}
+                >
+                    {/* Secțiunea Imaginii */}
+                    {fullImageUrl ? (
+                        <Image 
+                            source={{ uri: fullImageUrl }} 
+                            className="w-full h-48 bg-gray-100"
+                            resizeMode="cover"
+                        />
+                    ) : (
+                        <View className="w-full h-48 bg-gray-200 items-center justify-center">
+                            <Text className="text-gray-400 font-medium">Fără Imagine</Text>
+                        </View>
+                    )}
+
+                    {/* Tag-ul cu Categoria */}
+                    <View className="absolute top-4 left-4 bg-blue-600 px-3 py-1.5 rounded-full shadow">
+                        <Text className="text-white text-xs font-bold uppercase tracking-wider">
+                            {item.category}
+                        </Text>
                     </View>
-                )}
 
-                {/* Tag-ul cu Categoria (Poziționat absolut peste imagine) */}
-                <View className="absolute top-4 left-4 bg-blue-600 px-3 py-1.5 rounded-full shadow">
-                    <Text className="text-white text-xs font-bold uppercase tracking-wider">
-                        {item.category}
-                    </Text>
-                </View>
-
-                {/* Detalii Eveniment */}
-                <View className="p-5">
-                    <Text className="text-xl font-bold text-gray-800 mb-1" numberOfLines={1}>
-                        {item.title}
-                    </Text>
-
-                    {/* Informații din tabela Venue (Nume și Oraș) */}
-                    <Text className="text-blue-600 font-semibold text-sm mb-3">
-                        📍 {item.venue?.name} • {item.venue?.city}
-                    </Text>
-
-                    <Text className="text-gray-500 text-sm mb-4 line-clamp-2" numberOfLines={2}>
-                        {item.description}
-                    </Text>
-
-                    {/* Divider bar */}
-                    <View className="h-[1px] bg-gray-100 w-full mb-4" />
-
-                    {/* Footer-ul cardului: Dată și Preț */}
-                    <View className="flex-row justify-between items-center">
-                        <View>
-                            <Text className="text-xs text-gray-400 font-medium uppercase">Dată eveniment</Text>
-                            <Text className="text-gray-700 font-bold mt-0.5">
-                                {new Date(item.date).toLocaleDateString('ro-RO', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric'
-                                })}
+                    {/* Badge evident poziționat peste imagine */}
+                    {canLeaveReview && (
+                        <View className="absolute top-4 right-4 bg-yellow-400 px-3 py-1.5 rounded-full shadow-lg flex-row items-center border border-yellow-500">
+                            <Text className="text-yellow-900 text-xs font-black tracking-wider uppercase">
+                                ⭐ Review Disponibil
                             </Text>
                         </View>
+                    )}
 
-                        {/* Buton simulat / Preț */}
-                        <View className="bg-slate-900 px-4 py-2.5 rounded-xl">
-                            <Text className="text-white font-bold text-center">
-                                {minPrice !== null
-                                    ? `Preț bilet - ${minPrice.toLocaleString('ro-RO')} ${currency[0]} `
-                                    : 'Preț indisponibil'}
+                    {/* Detalii Eveniment */}
+                    <View className="p-5">
+                        <Text className="text-xl font-bold text-gray-800 mb-1" numberOfLines={1}>
+                            {item.title}
+                        </Text>
+
+                        {/* Informații din tabela Venue (Nume și Oraș) */}
+                        <Text className="text-blue-600 font-semibold text-sm mb-3">
+                            📍 {item.venue?.name} • {item.venue?.city}
+                        </Text>
+
+                        <Text className="text-gray-500 text-sm mb-4 line-clamp-2" numberOfLines={2}>
+                            {item.description}
+                        </Text>
+
+                        {/* Divider bar */}
+                        <View className="h-[1px] bg-gray-100 w-full mb-4" />
+
+                        {/* Footer-ul cardului: Dată și Preț */}
+                        <View className="flex-row justify-between items-center">
+                            <View>
+                                <Text className="text-xs text-gray-400 font-medium uppercase">Dată eveniment</Text>
+                                <Text className="text-gray-700 font-bold mt-0.5">
+                                    {new Date(item.date).toLocaleDateString('ro-RO', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    })}
+                                </Text>
+                            </View>
+
+                            {/* Buton simulat / Preț sau Review */}
+                        <View className={`px-4 py-2.5 rounded-xl ${canLeaveReview ? 'bg-yellow-500' : 'bg-slate-900'}`}>
+                            <Text className="text-white font-bold text-center shadow-sm">
+                                {canLeaveReview 
+                                    ? 'Scrie un Review' 
+                                    : (minPrice !== null
+                                        ? `Preț bilet - ${minPrice.toLocaleString('ro-RO')} ${currency[0]} `
+                                        : 'Preț indisponibil')
+                                }
                             </Text>
                         </View>
+                        </View>
                     </View>
-                </View>
+                </Animated.View>
             </TouchableOpacity>
         );
     };
@@ -222,7 +288,7 @@ const HomeScreen = () => {
                         />
 
                         <TextInput
-                            placeholder='Spune sau scrie ce cauti'
+                            placeholder='Spune sau scrie ce cauți'
                             placeholderTextColor="#9CA3AF"
                             className='flex-1 ml-3 text-base text-gray-800'
                             onChangeText={setText}
@@ -233,7 +299,7 @@ const HomeScreen = () => {
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 onPress={() => {
-                                    if (openModal && modal?.closeModal){
+                                    if (openModal && !modal?.visible){
                                         openModal(<SearchEvents 
                                             inModal={true}
                                             initialText={text}

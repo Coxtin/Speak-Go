@@ -8,10 +8,10 @@ export type EventResponse = Prisma.EventGetPayload<{
     include: { venue: true, ticketTypes: {select: { price: true, currency: true } } }
 }>;
 
-export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? : EventResponse[]}> => {
+export const fetchDataBaseForEvents = async(userId: number): Promise<{value: boolean, events? : EventResponse[]}> => {
 
     try {
-        console.log("[SERVICE]: Se execută prisma.event.findMany...");
+        // console.log("[SERVICE]: Se execută prisma.event.findMany...");
         const events = await prisma.event.findMany({
             include: {
                 venue: true,
@@ -19,6 +19,24 @@ export const fetchDataBaseForEvents = async(): Promise<{value: boolean, events? 
                     select: {
                         price: true,
                         currency: true
+                    }
+                },
+                reviews: {
+                    where: {
+                        userId: userId
+                    }
+                },
+                bookings: {
+                    where: {
+                        userId: userId,
+                        tickets: {
+                            some: {
+                                status: "SCANNED"
+                            }
+                        }
+                    },
+                    select: {
+                        id: true
                     }
                 }
             },
@@ -94,6 +112,44 @@ export const searchEventsByFilters = async (filters: EventFilter) => {
         console.error("Eroare la interogarea bazei de date!");
         return { value: false, message: error };
         
+    }
+
+}
+
+export const addReviewToEvent = async(userId: number, eventId: number, comment: string, rating: number) => {
+
+    try {
+        console.log(`[SERVICE addReviewToEvent] Executam verificare duplicate pentru userId: ${userId}, eventId: ${eventId}`);
+
+        const existingReview = await prisma.review.findFirst({
+            where: {
+                userId: userId,
+                eventId: eventId
+            }
+        });
+
+        if (existingReview){
+            console.log(`[SERVICE addReviewToEvent] Eroare logica: Utilizatorul a lasat deja un review (ID existent: ${existingReview.id})`);
+            return { value: false, message: "Ai lăsat deja un review pentru acest eveniment!" };
+        }
+
+        console.log(`[SERVICE addReviewToEvent] Niciun duplicat gasit. Inseram review-ul: rating=${rating}, comment=${comment}`);
+        
+        const newReview = await prisma.review.create({
+            data: {
+                userId: userId,
+                eventId: eventId,
+                rating: rating,
+                comment: comment
+            }
+        })
+        
+        console.log(`[SERVICE addReviewToEvent] Review creat cu succes in baza de date! ID-ul este: ${newReview.id}`);
+        return { value: true };
+
+    } catch (error: any){
+        console.error("[SERVICE addReviewToEvent] EROARE FATALA Prisma: ", error);
+        return { value: false, message: "Eroare internă a bazei de date" };
     }
 
 }

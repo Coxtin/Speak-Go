@@ -15,7 +15,7 @@ export const signupSchema = z.object({
         email: z.email({ message: "Introdu o adresa de email valida!" }),
         birthDate: z
         .date({
-           error: issue => issue.input === undefined ? "Data nasterii este obligatorie!" : "Data invalida!"
+           error: issue => issue.input === undefined ? "Data nasterii este obligatorie!" : "Dată invalida!"
         })
         .min(new Date("1900-01-01"), {message: "Data nasterii este prea veche pentru un cont valid!"})
         .max(new Date(), {message: "Data nasterii nu poate fi in viitor!"}),

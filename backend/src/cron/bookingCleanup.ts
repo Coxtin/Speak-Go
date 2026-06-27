@@ -4,7 +4,6 @@ let isRunning = false;
 
 export const bookingCleanup = () => {
     
-    // 2 minute transformate în milisecunde (2 * 60 secunde * 1000 milisecunde)
     const INTERVAL_MS = 2 * 60 * 1000;
 
     setInterval(async () => {

@@ -8,7 +8,9 @@ export const fetchEvents = async(req: Request, res: Response) => {
 
     try {
 
-        const response = await eventService.fetchDataBaseForEvents();
+        const userId = parseInt(res.locals.user?.userId);
+
+        const response = await eventService.fetchDataBaseForEvents(userId);
 
         if (response.value === true && response.events){
             console.log(`[DEBUG]: S-au găsit ${response.events.length} evenimente`);
@@ -39,7 +41,7 @@ export const searchEvent = async (req: Request, res: Response) => {
 
         if (response?.value === false && response?.events === null){
 
-            return res.status(404).json({message: "Nu exista evenimente care sa corespunda cautarii dvs."});
+            return res.status(404).json({message: "Nu există evenimente care să corespundă căutării dvs. !"});
 
         } else if (response?.value === false && response.message){
 
@@ -56,7 +58,7 @@ export const searchEvent = async (req: Request, res: Response) => {
     } catch (error: any){
 
         console.error("Eroare la cautarea evenimentelor: ", error);
-        return res.status(401).json({message: "Nu am putut filtra evenimentele! Va rugam, incercati mai tarziu!"});
+        return res.status(401).json({message: "Nu am putut filtra evenimentele! Vă rugam, încercați mai târziu!"});
 
     }
 
@@ -69,7 +71,7 @@ export const fetchTicketsForEvents = async (req: Request, res: Response) => {
         const eventId = parseInt(req.params.id, 10);
 
         if (isNaN(eventId)){
-            return res.status(400).json({message: "ID-ul evenimentului trebuie sa fie un numar valid!"});
+            return res.status(400).json({message: "ID-ul evenimentului trebuie să fie un număr valid!"});
         }
 
         const response = await getEventTicketDetails(eventId);
@@ -84,10 +86,42 @@ export const fetchTicketsForEvents = async (req: Request, res: Response) => {
         
         console.error("Eroare la returnarea biletelor: ", error);
 
-        if (error.message === "A aparut o problema la identificarea evenimentului!")
+        if (error.message === "A aparut o problemă la identificarea evenimentului!")
             return res.status(401).json({message: error.message});
         else
-            return res.status(500).json({message: "Eroare interna a server-ului"});
+            return res.status(500).json({message: "Eroare internă a server-ului"});
+    }
+
+}
+
+export const insertFeedback = async (req: Request, res: Response) => {
+
+    try {
+        console.log("\n--- [CONTROLLER insertFeedback] START ---");
+        const { eventId, text, rating } = req.body;
+        
+        console.log(`[CONTROLLER insertFeedback] Parametri primiti din body: eventId=${eventId}, rating=${rating}, text=${text}`);
+        
+        const userId = parseInt(res.locals.user?.userId);
+        console.log(`[CONTROLLER insertFeedback] User ID extras din token: ${userId}`);
+
+        if (isNaN(userId)) {
+            console.error("[CONTROLLER insertFeedback] Eroare: User ID este NaN. Probabil tokenul este invalid.");
+            return res.status(401).json({ message: "Utilizator neautentificat sau ID invalid." });
+        }
+
+        const response = await eventService.addReviewToEvent(userId, eventId, text, rating);
+        console.log(`[CONTROLLER insertFeedback] Raspuns de la service:`, response);
+
+        if (response?.value === false){
+            return res.status(400).json({ message: response?.message });
+        } else {
+            return res.status(200).json({ message: "Review adăugat cu succes!" });
+        }
+
+    } catch (error: any){
+        console.error("[CONTROLLER insertFeedback] Eroare la salvarea recenziei: ", error);
+        return res.status(500).json({ message: "Eroare internă" })
     }
 
 }
