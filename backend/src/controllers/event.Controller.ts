@@ -19,11 +19,11 @@ export const fetchEvents = async(req: Request, res: Response) => {
         }
 
         console.log("[DEBUG]: Nu s-au găsit evenimente în DB");
-        return res.status(404).json({message: "Nu exista evenimente disponibile"});
+        return res.status(404).json({message: "Nu există evenimente disponibile"});
 
     } catch (error: any){
         console.error("[DEBUG]: Eroare la incarcarea evenimentelor: ", error);
-        return res.status(500).json({message: "Nu s-au putut incarca evenimentele! Va rugam, incercati mai tarziu!"});
+        return res.status(500).json({message: "Nu s-au putut încărca evenimentele! Vă rugăm să încercați mai târziu!"});
     }
 
 }
@@ -53,12 +53,12 @@ export const searchEvent = async (req: Request, res: Response) => {
 
             console.log("Trimit inapoi", response.filteredEvents);
 
-            return res.status(200).json({message: "Evenimente care corespund cautarii dvs.", events: response.filteredEvents})
+            return res.status(200).json({message: "Evenimente care corespund căutării dvs.", events: response.filteredEvents})
         }
     } catch (error: any){
 
         console.error("Eroare la cautarea evenimentelor: ", error);
-        return res.status(401).json({message: "Nu am putut filtra evenimentele! Vă rugam, încercați mai târziu!"});
+        return res.status(401).json({message: "Nu am putut filtra evenimentele! Vă rugăm să încercați mai târziu!"});
 
     }
 
@@ -89,7 +89,7 @@ export const fetchTicketsForEvents = async (req: Request, res: Response) => {
         if (error.message === "A aparut o problemă la identificarea evenimentului!")
             return res.status(401).json({message: error.message});
         else
-            return res.status(500).json({message: "Eroare internă a server-ului"});
+            return res.status(500).json({message: "Eroare internă a serverului"});
     }
 
 }

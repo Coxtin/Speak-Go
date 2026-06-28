@@ -142,6 +142,12 @@ export const confirmPaymentAndGenerateTickets = async (userId: number, bookingId
             return { value: false, message: "Plata nu a fost finalizata la nivelul bancii!" };
         }
 
+        const countTickets = await prisma.ticket.count({
+            where: {
+                bookingId: bookingId
+            }
+        });
+
         await prisma.$transaction([
             prisma.booking.update({
                 where: {
@@ -159,10 +165,18 @@ export const confirmPaymentAndGenerateTickets = async (userId: number, bookingId
                 data: {
                     status: "ACTIVE"
                 }
+            }),
+            prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    totalTicketsBought: { increment: countTickets }
+                }
             })
         ]);
 
-        // Trimitem email-ul de confirmare (asincron, nu așteptăm după el pentru a nu bloca răspunsul)
+        
         sendBookingEmail(booking.id).catch(err => console.error("Eroare la trimiterea email-ului de confirmare:", err));
 
         return { value: true, message: "Plata confirmata si biletele au fost activate!" };

@@ -1,29 +1,30 @@
 import { PrismaClientKnownRequestError } from "../../generated/prisma/internal/prismaNamespace"
 import { prisma } from "../config/db"
 import { Prisma } from "../../generated/prisma"
-import { EventFilter } from '../types/event.types'
-// import { EventResponse } from "../types/event.types";
-
-export type EventResponse = Prisma.EventGetPayload<{
-    include: { venue: true, ticketTypes: {select: { price: true, currency: true } } }
-}>;
+import { EventFilter, EventResponse } from '../types/event.types'
 
 export const fetchDataBaseForEvents = async(userId: number): Promise<{value: boolean, events? : EventResponse[]}> => {
 
     try {
-        // console.log("[SERVICE]: Se execută prisma.event.findMany...");
+      
         const events = await prisma.event.findMany({
             include: {
                 venue: true,
                 ticketTypes: {
                     select: {
                         price: true,
-                        currency: true
+                        currency: true,
+                        _count: {
+                            select: {
+                                tickets: true
+                            }
+                        }
                     }
                 },
                 reviews: {
-                    where: {
-                        userId: userId
+                    select: {
+                        userId: true,
+                        rating: true
                     }
                 },
                 bookings: {
@@ -45,8 +46,30 @@ export const fetchDataBaseForEvents = async(userId: number): Promise<{value: boo
             }
         });
 
+        const formattedEvents = events.map(event => {
+            const totalTicketsSold = event.ticketTypes.reduce(
+                (sum, tt) => sum + (tt._count?.tickets || 0), 0
+            );
+
+            const totalRating = event.reviews.reduce(
+                (sum, r) => sum + r.rating, 0
+            );
+            const averageRating = event.reviews.length > 0 
+            ? (totalRating / event.reviews.length).toFixed(1)
+            : null;
+
+            const currentUserReviews = event.reviews.filter(r => r.userId === userId);
+
+            return {
+                ...event,
+                reviews: currentUserReviews,
+                averageRating,
+                isSoldOut: (event.venue.capacity - totalTicketsSold) <= 0
+            };
+        })
+
         console.log(`[SERVICE]: findMany a returnat ${events.length} evenimente.`);
-        return {value: true, events: events as EventResponse[]};
+        return {value: true, events: formattedEvents as EventResponse[]};
 
     } catch (error: any){
 
@@ -92,17 +115,49 @@ export const searchEventsByFilters = async (filters: EventFilter) => {
             where: whereClause,
             include: {
                 venue: true,
-                ticketTypes: true
+                ticketTypes: {
+                    include: {
+                        _count: {
+                            select: {
+                                tickets: true
+                            },
+                        },
+                    },
+                },
+                reviews: {
+                    select: {
+                        userId: true,
+                        rating: true
+                    }
+                }
             },
             orderBy: {
                 date: 'asc'
             }
         });
-        
-        if (events.length > 0)
 
-            return { value: true, filteredEvents: events };
+        if (events.length > 0){
 
+            const formattedEvents = events.map(event => {
+                const totalTicketsSold = event.ticketTypes.reduce(
+                    (sum, tt) => sum + (tt._count?.tickets || 0), 0
+                );
+
+                const totalRating = event.reviews.reduce((sum, r) => sum + r.rating, 0);
+                const averageRating = event.reviews.length > 0 
+                    ? (totalRating / event.reviews.length).toFixed(1)
+                    : null;
+
+                return {
+                    ...event,
+                    reviews: [],
+                    averageRating,
+                    isSoldOut: (event.venue.capacity - totalTicketsSold) <= 0
+                }
+            })
+
+            return { value: true, filteredEvents: formattedEvents };
+        }
         else
 
             return {value: false, events: null};
@@ -113,7 +168,6 @@ export const searchEventsByFilters = async (filters: EventFilter) => {
         return { value: false, message: error };
         
     }
-
 }
 
 export const addReviewToEvent = async(userId: number, eventId: number, comment: string, rating: number) => {

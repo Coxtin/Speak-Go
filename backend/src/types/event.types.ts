@@ -1,26 +1,32 @@
-export interface EventResponse {
+import { Prisma } from "../../generated/prisma"
 
-    id: number,
-    title: string,
-    description: string,
-    category: string,
-    date: Date,
-    imageUrl: string | null,
-    status: string | null,
-    venue: {
-        name: string,
-        city: string,
-        address: string,
-        capacity: number
+export type EventResponse = Prisma.EventGetPayload<{
+    include: { 
+        venue: true,
+        ticketTypes:{ 
+            select: { 
+                price: true,
+                currency: true,
+                _count: {
+                    select: {
+                        tickets: true
+                    },
+                },
+            },
+        },
+        reviews: {
+            select: {
+                    userId: true,
+                    rating: true
+                },
+        },
+        bookings: {
+            select:{
+                id: true
+            },
+        },
     },
-    ticketTypes: {
-        id: number,
-        name: string,
-        price: number,
-        quantity: number,
-    }[];
-
-}
+}> & { isSoldOut: boolean, averageRating?: string | null } ;
 
 export interface EventFilter  {
     

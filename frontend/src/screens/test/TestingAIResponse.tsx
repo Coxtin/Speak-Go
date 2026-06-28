@@ -39,7 +39,7 @@ const TestingAIResponse = () => {
         
         } catch (error: any){
             console.error("Eroare la receptarea mesajului de la ai");
-            Alert.alert("Eroare", error?.message || "A aparut o problema la procesarea mesajului.");
+            Alert.alert("Eroare", error?.message || "A apărut o problemă la procesarea mesajului.");
         } finally {
             setIsLoading(false);
         }

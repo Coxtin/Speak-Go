@@ -30,7 +30,7 @@ export const processUserCommand = async (conversationHistory: Array<ChatCompleti
 
     if (!rawResponse){
         console.error("Nu am primit un raspuns de la serviciul de procesare: ");
-        return {value: false, message: "Nu am primit un raspuns de la serviciul de procesare! Va rugam incercari mai tarziu"};
+        return {value: false, message: "Nu am primit un răspuns de la serviciul de procesare! Vă rugăm să încercați mai târziu!"};
     }
 
     const parsedJSON = JSON.parse(rawResponse);

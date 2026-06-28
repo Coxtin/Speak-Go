@@ -33,7 +33,7 @@ export const makePayment = async (req: Request, res: Response) => {
         if (error.message && error.message.startsWith("NOT_FOUND:"))
             return res.status(404).json({message: error.message})
         else
-            return res.status(500).json({message: "Eroare interna a serverului la citirea datelor biletelor!"});
+            return res.status(500).json({message: "Eroare internă a serverului la citirea datelor biletelor!"});
     }
 
 }
@@ -53,7 +53,7 @@ export const bookTicket = async (req: Request, res: Response) => {
 
         if (!bookingId){
             console.error("Nu a fost gasit bookingId!");
-            return res.status(404).json({message: "Nu a fost gasit id-ul biletului!"});
+            return res.status(404).json({message: "Nu a fost găsit ID-ul biletului!"});
         }
 
         const response = await paymentService.confirmPaymentAndGenerateTickets(userId, bookingId);
@@ -68,7 +68,7 @@ export const bookTicket = async (req: Request, res: Response) => {
     } catch (error: any){
         
         console.error("Eroar la confirmarea platii: ", error);
-        return res.status(500).json({message: "Eroare interna a server-ului!"});
+        return res.status(500).json({message: "Eroare internă a serverului!"});
 
     }
 

@@ -28,7 +28,7 @@ export const registerNewUser = async (userData: any) => {
             data : {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                username: userData.userName,
+                username: userData.username,
                 email: userData.email,
                 birthDate: userData.birthDate,
                 password: hashedPassword
@@ -90,7 +90,7 @@ export const loginUser = async (credentials: any) => {
     );
 
         return {
-            message: 'Autentificare reusita!',
+            message: 'Autentificare reușită!',
             user: {
                 id: person.id,
                 email: person.email,
@@ -132,11 +132,11 @@ export const sendResetCode = async (email: string) => {
 
             if (codeCount && codeCount >= 3){
 
-                console.log ("Ati depasit limita pentru trimiterea codului de resetare! Va rugam, incercati mai tarziu!");
+                console.log ("Ati depasit limita pentru trimiterea codului de resetare! Vă rugăm să încercați mai târziu!");
                 return {
                     value: false,
                     status: 429,
-                    message: "Ati depasit limita de coduri solicitate. Va rugam sa asteptati 5 minute!"
+                    message: "Ați depășit limita de coduri solicitate. Vă rugăm să așteptați 5 minute!"
                 };
 
             }
@@ -182,7 +182,7 @@ export const sendResetCode = async (email: string) => {
             return {
                 value: true,
                 status: 200,
-                message: "Email-ul pentru resetarea parolei a fost trimisa la aceasta adresa!"
+                message: "Email-ul pentru resetarea parolei a fost trimis la această adresă!"
             };
 
         } else {
@@ -190,7 +190,7 @@ export const sendResetCode = async (email: string) => {
             return {
                 value: true,
                 status: 200,
-                message: "Email-ul pentru resetarea parolei a fost trimisa la aceasta adresa!"
+                message: "Email-ul pentru resetarea parolei a fost trimis la această adresă!"
             };
         }
 
@@ -259,7 +259,7 @@ export const verifyResetCode = async (email: string, code: string) => {
         return {
             value: false,
             status: 400,
-            message: "Acest cod este expirat. Va rugam sa reluati procesul de resetare a parolei!"
+            message: "Acest cod este expirat. Vă rugăm să reluați procesul de resetare a parolei!"
         };
 
     const codeMatch = await bcrypt.compare(code, codeInfo.code);
@@ -317,7 +317,7 @@ export const modifyPassword = async (newPassword: string, token: string) => {
         return {
             value: true,
             status: 200,
-            message: "Parola a fost modificata cu succes! Te poti loga acum!"
+            message: "Parola a fost modificată cu succes! Te poți loga acum!"
         };
 
     } catch (error: any){
@@ -326,7 +326,7 @@ export const modifyPassword = async (newPassword: string, token: string) => {
             return {
                 value: false,
                 status: 401,
-                message: "Sesiunea a expirat (au trecut cele 5 minute). Te rugam sa reiei pasii!"
+                message: "Sesiunea a expirat (au trecut cele 5 minute). Te rugăm să reiei pașii!"
             }
 
         if (error.name === 'JsonWebTokenError')

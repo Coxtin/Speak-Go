@@ -18,7 +18,6 @@ import { BASE_URL } from '../../config/config';
 import { Ionicons } from '@expo/vector-icons';
 import { EventParams } from '../types/eventParams';
 import { ModalContext } from '../context/ModalContext';
-import { EventFilter } from '../types/EventFilter';
 import SearchEvents from '../screens/main/SearchEvents';
 
 const HomeScreen = () => {
@@ -46,8 +45,6 @@ const HomeScreen = () => {
         title: category,
         data: groupedEvents[category]
     }));
-
-    //console.log("Date primite de la Backend: ", JSON.stringify(events, null, 2));
 
     if (isLoading && events.length === 0){
         return (
@@ -103,8 +100,8 @@ const HomeScreen = () => {
                         withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
                         withTiming(0, { duration: 1200, easing: Easing.inOut(Easing.ease) })
                     ),
-                    -1, // Infinit
-                    true // Reversibil
+                    -1, 
+                    true 
                 );
             } else {
                 pulse.value = 0;
@@ -131,11 +128,14 @@ const HomeScreen = () => {
             };
         });
 
+        const isSoldOut = (item as any).isSoldOut;
+
         return (
             <TouchableOpacity 
-                activeOpacity={0.9}
-                onPress={() => goToEventPage(item)}
-                className="mb-6"
+                activeOpacity={isSoldOut ? 1 : 0.9}
+                onPress={() => !isSoldOut && goToEventPage(item)}
+                className={`mb-6 ${isSoldOut ? 'opacity-60' : ''}`}
+                disabled={isSoldOut}
             >
                 <Animated.View 
                     className="bg-white rounded-3xl overflow-hidden"
@@ -161,14 +161,27 @@ const HomeScreen = () => {
                         </Text>
                     </View>
 
-                    {/* Badge evident poziționat peste imagine */}
-                    {canLeaveReview && (
-                        <View className="absolute top-4 right-4 bg-yellow-400 px-3 py-1.5 rounded-full shadow-lg flex-row items-center border border-yellow-500">
-                            <Text className="text-yellow-900 text-xs font-black tracking-wider uppercase">
-                                ⭐ Review Disponibil
-                            </Text>
-                        </View>
-                    )}
+                    {/* Container dreapta-sus pentru Badge-uri */}
+                    <View className="absolute top-4 right-4 flex-col items-end gap-2 z-10">
+                        {/* 1. Badge-ul tău de Review Disponibil */}
+                        {canLeaveReview && (
+                            <View className="bg-yellow-400 px-3 py-1.5 rounded-full shadow-lg flex-row items-center border border-yellow-500">
+                                <Text className="text-yellow-900 text-xs font-black tracking-wider uppercase">
+                                    ⭐ Review Disponibil
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* 2. Badge-ul de Rating */}
+                        {(item as any).averageRating && (
+                            <View className="bg-white/95 px-3 py-1.5 rounded-full shadow-md flex-row items-center border border-gray-100">
+                                <Ionicons name="star" size={14} color="#F59E0B" />
+                                <Text className="text-slate-800 text-xs font-black ml-1">
+                                    {(item as any).averageRating}/5
+                                </Text>
+                            </View>
+                        )}
+                    </View>
 
                     {/* Detalii Eveniment */}
                     <View className="p-5">
@@ -202,13 +215,15 @@ const HomeScreen = () => {
                             </View>
 
                             {/* Buton simulat / Preț sau Review */}
-                        <View className={`px-4 py-2.5 rounded-xl ${canLeaveReview ? 'bg-yellow-500' : 'bg-slate-900'}`}>
+                        <View className={`px-4 py-2.5 rounded-xl ${isSoldOut ? 'bg-red-600' : (canLeaveReview ? 'bg-yellow-500' : 'bg-slate-900')}`}>
                             <Text className="text-white font-bold text-center shadow-sm">
-                                {canLeaveReview 
-                                    ? 'Scrie un Review' 
-                                    : (minPrice !== null
-                                        ? `Preț bilet - ${minPrice.toLocaleString('ro-RO')} ${currency[0]} `
-                                        : 'Preț indisponibil')
+                                {isSoldOut 
+                                    ? 'Bilete Epuizate'
+                                    : (canLeaveReview 
+                                        ? 'Scrie un Review' 
+                                        : (minPrice !== null
+                                            ? `Preț bilet - ${minPrice.toLocaleString('ro-RO')} ${currency[0]} `
+                                            : 'Preț indisponibil'))
                                 }
                             </Text>
                         </View>

@@ -1,14 +1,31 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { getUserInfo } from '../../api/user.api';
 
 const UserPage = () => {
     const auth = useContext(AuthContext);
     const user = auth?.user;
     const navigation = useNavigation<any>();
+
+    const [userData, setUserData] = useState<{createdAt?: string, totalTickets?: number} | null>(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            const fetchUserData = async () => {
+                try {
+                    const data = await getUserInfo();
+                    setUserData(data);
+                } catch(error) {
+                    console.log("Nu am putut prelua datele", error);
+                }
+            }
+            fetchUserData();
+        }, [])
+    );
 
     const handleLogout = () => {
         Alert.alert(
@@ -42,6 +59,21 @@ const UserPage = () => {
         </TouchableOpacity>
     );
 
+    const ticketsCount = userData?.totalTickets || 0;
+    
+    const getUserRank = (count: number) => {
+        if (count >= 20) return { title: 'VIP', color: '#8B5CF6', iconName: 'star' }; // Mov
+        if (count >= 10) return { title: 'Gold', color: '#F59E0B', iconName: 'star' }; // Auriu
+        if (count >= 5) return { title: 'Silver', color: '#9CA3AF', iconName: 'star-half' }; // Argintiu
+        return { title: 'Bronze', color: '#B45309', iconName: 'star-outline' }; // Bronz
+    };
+    
+    const userRank = getUserRank(ticketsCount);
+    
+    const formattedJoinDate = userData?.createdAt 
+        ? new Date(userData.createdAt).toLocaleDateString('ro-RO', { month: 'long', year: 'numeric' })
+        : 'Se încarcă...';
+
     return (
         <SafeAreaView className="flex-1 bg-white">
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -61,19 +93,14 @@ const UserPage = () => {
                 <View className="flex-row justify-around bg-white mx-8 -mt-8 rounded-3xl py-5 shadow-xl shadow-gray-200 border border-gray-50 z-10">
                     <View className="items-center">
                         <Text className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Bilete</Text>
-                        <Text className="text-gray-900 text-lg font-black">12</Text>
-                    </View>
-                    <View className="w-[1px] h-8 bg-gray-100 self-center" />
-                    <View className="items-center">
-                        <Text className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Recenzii</Text>
-                        <Text className="text-gray-900 text-lg font-black">5</Text>
+                        <Text className="text-gray-900 text-lg font-black">{ticketsCount}</Text>
                     </View>
                     <View className="w-[1px] h-8 bg-gray-100 self-center" />
                     <View className="items-center">
                         <Text className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Rank</Text>
                         <View className="flex-row items-center">
-                            <Ionicons name="star" size={14} color="#F59E0B" />
-                            <Text className="text-gray-900 text-lg font-black ml-1">Gold</Text>
+                            <Ionicons name={userRank.iconName as any} size={14} color={userRank.color} />
+                            <Text className="text-gray-900 text-lg font-black ml-1">{userRank.title}</Text>
                         </View>
                     </View>
                 </View>
@@ -82,28 +109,14 @@ const UserPage = () => {
                 <View className="px-6 mt-10">
 
                     <Text className="text-gray-400 text-xs font-black uppercase tracking-widest mb-4 ml-1">Informații Cont</Text>
-                    <View className="bg-gray-50 rounded-3xl p-5 mb-8 border border-gray-100 flex-row justify-between">
-                        <View className="items-center flex-1">
-                            <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
-                            <Text className="text-gray-400 text-[10px] font-bold mt-1">MEMBRU DIN</Text>
-                            <Text className="text-gray-700 font-bold text-xs">Iunie 2024</Text>
-                        </View>
-                        <View className="w-[1px] h-10 bg-gray-200 self-center" />
-                        <View className="items-center flex-1">
-                            <Ionicons name="shield-checkmark-outline" size={20} color="#10B981" />
-                            <Text className="text-gray-400 text-[10px] font-bold mt-1">STATUS</Text>
-                            <Text className="text-green-600 font-bold text-xs">Verificat</Text>
-                        </View>
+                    <View className="bg-gray-50 rounded-3xl p-5 mb-8 border border-gray-100 items-center">
+                        <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
+                        <Text className="text-gray-400 text-[10px] font-bold mt-1">MEMBRU DIN</Text>
+                        <Text className="text-gray-700 font-bold text-xs capitalize">{formattedJoinDate}</Text>
                     </View>
                     
                     <Text className="text-gray-400 text-xs font-black uppercase tracking-widest mb-4 ml-1">General</Text>
                     <View className="bg-white rounded-3xl border border-gray-100 px-4 mb-8 shadow-sm">
-                        <MenuOption 
-                            icon="person-outline" 
-                            title="Editează Profilul" 
-                            subtitle="Nume, imagine și detalii contact"
-                            onPress={() => Alert.alert("Info", "Funcționalitate în curs de dezvoltare")}
-                        />
                         <MenuOption 
                             icon="lock-closed-outline" 
                             title="Schimbă Parola" 

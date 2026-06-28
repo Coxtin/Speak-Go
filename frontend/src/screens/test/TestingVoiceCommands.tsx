@@ -21,11 +21,11 @@ const VoiceCommands = () => {
 
         if (!permission.granted){
             if (Platform.OS === 'web'){
-                window.alert("Nu putem sa accesam microfonul!");
+                window.alert("Nu putem să accesăm microfonul!");
                 return;
             }
             else{
-                Alert.alert("Nu putem sa accesam microfonul!");
+                Alert.alert("Nu putem să accesăm microfonul!");
                 return;
             }
         } else{

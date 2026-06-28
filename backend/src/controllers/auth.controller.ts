@@ -29,7 +29,7 @@ export const login = async (req: Request, res: Response) => {
 
         const loginData = await authService.loginUser(req.body);
 
-        return res.status(200).json({message: "Autentificare reusita!", data: loginData});
+        return res.status(200).json({message: "Autentificare reușită!", data: loginData});
     } catch (error : any){
 
         if (error.message === INVALID_CREDENTIALS_ERROR)

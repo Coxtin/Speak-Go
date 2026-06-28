@@ -98,13 +98,13 @@ const PaymentSummary = () => {
                         return;
                     }
 
-                    Alert.alert("Succes!", "Plata a fost realizata cu succes! Biletele tale au fost activate!");
+                    Alert.alert("Succes!", "Plata a fost realizată cu succes! Biletele tale au fost activate!");
                     navigation.navigate("MainTabs", { screen: "Biletele mele" });
 
                 } catch (error: any){
 
                     console.error(error);
-                    Alert.alert("Eroare", "Nu am putut verifica statusul biletelor! Verifica sectiunea 'Biletele mele'!");
+                    Alert.alert("Eroare", "Nu am putut verifica statusul biletelor! Verifică secțiunea 'Biletele mele'!");
                     navigation.navigate("MainTabs", { screen: "Biletele mele" });
 
                 }

@@ -14,7 +14,7 @@ export const fetchTickets = async (req: Request, res: Response) => {
         return res.status(200).json({ tickets: response.tickets });
     } catch (error: any) {
         console.error("Eroare in fetchTickets: ", error);
-        return res.status(500).json({ message: "Eroare interna a serverului!" });
+        return res.status(500).json({ message: "Eroare internă a serverului!" });
     }
 };
 
@@ -51,7 +51,7 @@ export const scanTicket = async (req: Request, res: Response) => {
         const { qrCode } = req.body;
 
         if (!qrCode) {
-            return res.status(400).json({ message: "Codul QR lipseste!" });
+            return res.status(400).json({ message: "Codul QR lipsește!" });
         }
 
         const response = await checkTicketQrCode(qrCode);
@@ -63,7 +63,7 @@ export const scanTicket = async (req: Request, res: Response) => {
 
     } catch (error: any){
         console.error("Eroare la scanarea biletului: ", error);
-        return res.status(500).json({ message: "Eroare interna la scanarea biletului!" });
+        return res.status(500).json({ message: "Eroare internă la scanarea biletului!" });
     }
 
 }

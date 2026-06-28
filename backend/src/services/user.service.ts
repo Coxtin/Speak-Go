@@ -43,3 +43,25 @@ export const updateUserPassword = async (userId: number, payload: ChangePassword
     }
 
 }
+
+export const returnInfoAboutUser = async (userId: number) => {
+
+    try {
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+        });
+
+        if (!user)
+            return { value: false, message: "Utilizatorul nu a fost găsit!" }
+
+        return { value: true, ticketCount: user.totalTicketsBought, createdAt: user.createdAt };
+
+    } catch (error: any){
+        console.error("Eroare la preluarea informaților utilizatorului");
+        return { value: false, message: "Nu am putut prelua informațiile dvs. !" }
+    }
+
+}

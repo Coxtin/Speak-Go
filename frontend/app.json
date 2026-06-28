@@ -55,7 +55,7 @@
       ]
     ],
     "extra": {
-      "baseUrl": "http://192.168.1.133:5002"
+      "baseUrl": "https://7b0f-2a02-2f05-2118-ed00-147e-5164-831c-13f0.ngrok-free.app"
     }
   }
 }

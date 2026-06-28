@@ -93,7 +93,7 @@ export const getUserTickets = async (userId: number) => {
 
 export const deleteTicket = async (ticketId: number, userId: number) => {
     try {
-        // Verificăm dacă biletul aparține utilizatorului
+        
         const ticket = await prisma.ticket.findFirst({
             where: {
                 id: ticketId,
