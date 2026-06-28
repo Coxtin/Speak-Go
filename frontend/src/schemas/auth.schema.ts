@@ -12,22 +12,22 @@ export const signupSchema = z.object({
             .nonempty({message: "Numele este obligatoriu!"}),
         username: z
             .string()
-            .min(5, { message: "Numele de utilizator trebuie sa aiba cel putin 5 caractere!" })
-            .max(20, { message: "Numele de utilizator trebuie sa aiba cel mult 20 de caractere!" })
+            .min(5, { message: "Numele de utilizator trebuie să aibă cel putin 5 caractere!" })
+            .max(20, { message: "Numele de utilizator trebuie să aibă cel mult 20 de caractere!" })
             .nonempty({message: "Numele de utilizator este obligatoriu!"}),
         email: z.email({ message: "Introdu o adresa de email valida!" }),
         birthDate: z
         .date({
-           error: issue => issue.input === undefined ? "Data nasterii este obligatorie!" : "Dată invalida!"
+           error: issue => issue.input === undefined ? "Data nașterii este obligatorie!" : "Dată invalida!"
         })
-        .min(new Date("1900-01-01"), {message: "Data nasterii este prea veche pentru un cont valid!"})
+        .min(new Date("1900-01-01"), {message: "Data nașterii este prea veche pentru un cont valid!"})
         .max(minAgeDate, {message: "Trebuie să ai minim 11 ani pentru a crea un cont!"}),
         password: z
             .string()
-            .min(8, {message: "Parola trebuie sa aiba cel putin 8 caractere!"})
-            .regex(/[A-Z]/, {message: "Parola trebuie sa contina cel putin o litera mare!"})
-            .regex(/[0-9]/, {message: "Parola trebuie sa contina cel putin o cifra!"})
-            .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie sa contina cel putin un caracter special!"}),
+            .min(8, {message: "Parola trebuie să aibă cel puțin 8 caractere!"})
+            .regex(/[A-Z]/, {message: "Parola trebuie să contină cel puțin o litera mare!"})
+            .regex(/[0-9]/, {message: "Parola trebuie să contină cel puțin o cifra!"})
+            .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie să contină cel puțin un caracter special!"}),
         repeatPassword: z
             .string()
             .nonempty({message: "Reintrodu parola!"})
@@ -36,31 +36,31 @@ export const signupSchema = z.object({
 export const loginSchema = z.object({
     email: z
         .email({message: "Introdu o adresa de email valida!"})
-        .nonempty({message: "Campul email este gol!"}),
+        .nonempty({message: "Câmpul email este gol!"}),
     password: z
         .string()
-        .min(1, {message: "Campul parola este gol!"})
+        .min(1, {message: "Câmpul parolă este gol!"})
 })
 
 export const resetPasswordSchema = z.object({
     email: z
         .email({message: "Introdu o adresa de email valida!"})
-        .nonempty({message: "Campul email este gol"})
+        .nonempty({message: "Câmpul email este gol"})
 })
 
 export const insertResetCodeSchema = z.object({
     code: z
         .string()
-        .regex(/^\d{6}$/, {message: "Codul trebuie sa contina exact 6 cifre!"}),
+        .regex(/^\d{6}$/, {message: "Codul trebuie să contină exact 6 cifre!"}),
 })
 
 export const modifyPasswordSchema = z.object({
     password: z
         .string()
-        .min(8, {message: "Parola trebuie sa aiba cel putin 8 caractere!"})
-        .regex(/[A-Z]/, {message: "Parola trebuie sa contina cel putin o litera mare!"})
-        .regex(/[0-9]/, {message: "Parola trebuie sa contina cel putin o cifra!"})
-        .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie sa contina cel putin un caracter special!"}),
+        .min(8, {message: "Parola trebuie să aibă cel puțin 8 caractere!"})
+        .regex(/[A-Z]/, {message: "Parola trebuie să contină cel putin o litera mare!"})
+        .regex(/[0-9]/, {message: "Parola trebuie să conțină cel puțin o cifra!"})
+        .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie să contină cel puțin un caracter special!"}),
     repeatPassword: z
         .string()
         .nonempty({message: "Reintrodu parola!"})
@@ -72,10 +72,10 @@ export const changePasswordSchema = z.object({
         .nonempty({message: "Parola veche este obligatorie!"}),
     newPassword: z
         .string()
-        .min(8, {message: "Parola noua trebuie sa aiba cel putin 8 caractere!"})
-        .regex(/[A-Z]/, {message: "Parola trebuie sa contina cel putin o litera mare!"})
-        .regex(/[0-9]/, {message: "Parola trebuie sa contina cel putin o cifra!"})
-        .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie sa contina cel putin un caracter special!"}),
+        .min(8, {message: "Parola noua trebuie să aibă cel puțin 8 caractere!"})
+        .regex(/[A-Z]/, {message: "Parola trebuie să contină cel puțin o litera mare!"})
+        .regex(/[0-9]/, {message: "Parola trebuie să contină cel puțin o cifra!"})
+        .regex(/[^a-zA-Z0-9]/, {message: "Parola trebuie să contină cel puțin un caracter special!"}),
     repeatNewPassword: z
         .string()
         .nonempty({message: "Reintrodu noua parola!"})
