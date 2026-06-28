@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+const minAgeDate = new Date();
+minAgeDate.setFullYear(minAgeDate.getFullYear() - 11);
+
 export const signupSchema = z.object({
     firstName: z
         .string()
@@ -18,7 +21,7 @@ export const signupSchema = z.object({
            error: issue => issue.input === undefined ? "Data nasterii este obligatorie!" : "Dată invalida!"
         })
         .min(new Date("1900-01-01"), {message: "Data nasterii este prea veche pentru un cont valid!"})
-        .max(new Date(), {message: "Data nasterii nu poate fi in viitor!"}),
+        .max(minAgeDate, {message: "Trebuie să ai minim 11 ani pentru a crea un cont!"}),
         password: z
             .string()
             .min(8, {message: "Parola trebuie sa aiba cel putin 8 caractere!"})

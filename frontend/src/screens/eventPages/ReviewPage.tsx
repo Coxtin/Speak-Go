@@ -98,7 +98,7 @@ const ReviewPage = ({ eventId, closeModal } : ReviewPageProps) => {
                             value={reviewText}
                             onChangeText={setReviewText}
                             maxLength={500}
-                            style={{ minHeight: 120 }} 
+                            style={{ minHeight: 200 }} 
                         />
                         <Text className="text-right text-xs text-gray-400 mt-2">
                             {reviewText.length}/500

@@ -20,6 +20,9 @@ const SignupPage = () => {
     const [showAgainPassword, setShowAgainPassword] = useState(false);
     const navigation = useNavigation<any>();
 
+    const defaultPickerDate = new Date();
+    defaultPickerDate.setFullYear(defaultPickerDate.getFullYear() - 11);
+
     const {
         control,
         handleSubmit,
@@ -244,7 +247,8 @@ const SignupPage = () => {
 
                                                         <DateTimePicker
                                                             mode="date"
-                                                            value={value || new Date()}
+                                                            value={value || defaultPickerDate}
+                                                            // maximumDate={new Date()}
                                                             display="spinner"
                                                             textColor="#000000"
                                                             onChange={(event, selectedDate) => {
@@ -260,7 +264,7 @@ const SignupPage = () => {
                                     ) : (
                                         showDatePicker && (
                                             <DateTimePicker
-                                                value={value || new Date()}
+                                                value={value || defaultPickerDate}
                                                 mode="date"
                                                 maximumDate={new Date()}
                                                 display="default"
